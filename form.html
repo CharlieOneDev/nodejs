@@ -69,39 +69,54 @@
 <h2>CONTACT<span>お問い合わせフォーム</span></h2>
 
 <!-- フォームの情報はここからです -->
-<form name="form1" enctype="multipart/form-data" method="post" action="<?php echo $_SERVER["REQUEST_URI"];?>">
-<input type="hidden" name="mode" value="form">
-<table class="ta1">
-<!-- 入力／確認 -->
-<!--<tr><th class="tamidashi" colspan="2">お問い合わせフォーム</th></tr>-->
-<tr>
-<th width="150">お名前<span style="color:red">※</span></th>
-<td>
-<input name="item1" value="<?php echo $form["item1"];?>" type="text" size="40" maxlength="500" class="ws">
-<?php if ($msg["item1"]) echo '<div style="color:red">' . $msg["item1"] . '</div>'; ?>
-</td>
-</tr>
-<tr>
-<th width="150">メールアドレス<span style="color:red">※</span></th>
-<td>
-<input name="item2" value="<?php echo $form["item2"];?>" type="text" size="40" maxlength="500" class="ws">
-<?php if ($msg["item2"]) echo '<div style="color:red">' . $msg["item2"] . '</div>'; ?>
-</td>
-</tr>
-<tr>
-<th>お問い合わせ内容<span style="color:red">※</span></th>
-<td>
-<textarea name="item3" cols="40" rows="10" class="wl"><?php echo $form["item3"]; ?></textarea>
-<?php if ($msg["item3"]) echo '<div style="color:red">' . $msg["item3"] . '</div>'; ?>
-</td>
-</tr>
-</table>
-<div class="c">
-<input type="submit" value="内容を確認する" class="btn">
-&nbsp;
-<input type="reset" value="リセット" class="btn">
-</div>
-</form>
+<form id="contactForm">
+    <table>
+      <tr>
+        <td>お名前※</td>
+        <td><input type="text" id="name" required></td>
+      </tr>
+      <tr>
+        <td>メールアドレス※</td>
+        <td><input type="email" id="email" required></td>
+      </tr>
+      <tr>
+        <td>お問い合わせ詳細※</td>
+        <td><textarea id="message" rows="6" required></textarea></td>
+      </tr>
+    </table>
+    <button type="submit">内容を確認する</button>
+  </form>
+
+  <script>
+    const form = document.getElementById('contactForm');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const message = document.getElementById('message').value.trim();
+
+      try {
+        const res = await fetch('https://nodejs-production-64e8.up.railway.app/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, message })
+        });
+
+        const result = await res.json();
+        if (res.ok) {
+          alert(result.message);
+          form.reset();
+        } else {
+          alert(result.error || "送信に失敗しました");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("エラーが発生しました。後でもう一度お試しください。");
+      }
+    });
+  </script>
+
 <!-- フォームの情報はここまでです -->
 
 </section>
