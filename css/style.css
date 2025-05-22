@@ -792,3 +792,49 @@ body {
 .pc {display:none;}
 
 }
+
+.about-section {
+  padding: 0 2rem; /* 全体左右内边距 */
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.about-section .section-block {
+  margin-bottom: 3em;
+}
+
+.about-section .section-block h3 {
+  font-size: 1.4em;
+  margin-bottom: 0.6em;
+  border-bottom: 1px dashed #ccc;
+  padding-bottom: 0.4em;
+  margin-left: 0;
+}
+
+.about-section .section-block p,
+.about-section .section-block ul,
+.about-section .section-block table {
+  margin: 0;
+  padding: 0;
+  margin-left: 0;
+}
+
+.about-section .section-block ul {
+  list-style: disc inside;
+  margin-left: 1em;
+}
+
+.about-section .section-block table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 0.8em;
+}
+
+.about-section .section-block th,
+.about-section .section-block td {
+  text-align: left;
+  padding: 0.5em;
+  border-bottom: 1px solid #eee;
+  vertical-align: top;
+}
+
