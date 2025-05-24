@@ -838,3 +838,44 @@ body {
   vertical-align: top;
 }
 
+.form-block {
+  margin-bottom: 20px;
+}
+
+.form-block label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 8px;
+  font-size: 1rem;
+}
+
+.form-block input,
+.form-block textarea {
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.form-button {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.form-button button {
+  background-color: #333;
+  color: #fff;
+  border: none;
+  padding: 12px 40px;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
+}
+
+.form-button button:hover {
+  background-color: #555;
+}
+
