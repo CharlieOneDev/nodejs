@@ -362,7 +362,10 @@ echo $head;
 // For now, keeping it to maintain original functionality.
 // Ensure $contents doesn't contain user-supplied PHP code.
 // The variables used in eval should be well-defined ($form, $msg, $captcha_path etc.)
-echo eval("?>" . $contents . "<?php "); // Added <?php to avoid issues if $contents ends with PHP code.
+ob_start(); // 开启输出缓冲
+eval("?>" . $contents . "<?php "); // 解析模板
+$html = ob_get_clean(); // 获取内容并清理缓冲
+echo $html; // 干净地输出
 
 /*
  * メール送信処理 (PHPMailer 版)
@@ -374,9 +377,9 @@ function sendMailWithPHPMailer($from, $to, $subject, $body_text, $attachments_da
 
     try {
         //Server settings
-        $mail->SMTPDebug = SMTP::DEBUG_SERVER; // Enable verbose debug output for testing
-		$mail->Debugoutput = 'html'; // Debug output format
-        //$mail->SMTPDebug = SMTP::DEBUG_OFF;     // Disable debug output for production
+        //$mail->SMTPDebug = SMTP::DEBUG_SERVER; // Enable verbose debug output for testing 测试时打开
+		//$mail->Debugoutput = 'html'; // Debug output format 测试时打开
+        $mail->SMTPDebug = SMTP::DEBUG_OFF;     // Disable debug output for production 上线时打开
         $mail->isSMTP();                        // Send using SMTP
         $mail->Host       = SMTP_HOST;          // Set the SMTP server to send through
         $mail->SMTPAuth   = true;               // Enable SMTP authentication
