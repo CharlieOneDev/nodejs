@@ -17,16 +17,16 @@ error_reporting (E_ALL & ~E_NOTICE & ~E_WARNING & ~E_STRICT & ~E_DEPRECATED);
 
 // ======== SMTP 服务器配置 (新添加) ========
 define("SMTP_HOST", 'smtp.gmail.com');       // 您的 SMTP 服务器地址
-define("SMTP_USERNAME", 'PHPmailer');     // 您的 SMTP 用户名
+define("SMTP_USERNAME", 'sukaboronet@gmail.com');     // 您的 SMTP 用户名
 define("SMTP_PASSWORD", 'qufd zdra ipfy rlww');     // 您的 SMTP 密码
 define("SMTP_SECURE", PHPMailer::ENCRYPTION_STARTTLS); // 加密方式: PHPMailer::ENCRYPTION_STARTTLS (TLS) 或 PHPMailer::ENCRYPTION_SMTPS (SSL)
-define("SMTP_PORT", 465);                           // SMTP 端口: 587 (TLS) 或 465 (SSL)
+define("SMTP_PORT", 587);                           // SMTP 端口: 587 (TLS) 或 465 (SSL)
 // ======== END SMTP 服务器配置 ========
 
 //
 $mail_sys = "customer@daion.co.jp"; // 管理者のメールアドレス
 $from_name = "大恩家具株式会社";     // メール送信者の表示
-$from_mail = "customer@daion.co.jp";     // メール送信者のメールアドレス（SMTP服务商可能要求与认证用户一致或已验证）
+$from_mail = "custsukaboronet@gmail.com";     // メール送信者のメールアドレス（SMTP服务商可能要求与认证用户一致或已验证）
 $user_mail = "item2";   // 利用者にメールを送る場合のメールアドレス項目
 //---
 $title = "お問い合わせフォーム";
