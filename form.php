@@ -20,7 +20,7 @@ define("SMTP_HOST", 'smtp.gmail.com');       // 您的 SMTP 服务器地址
 define("SMTP_USERNAME", 'PHPmailer');     // 您的 SMTP 用户名
 define("SMTP_PASSWORD", 'qufd zdra ipfy rlww');     // 您的 SMTP 密码
 define("SMTP_SECURE", PHPMailer::ENCRYPTION_STARTTLS); // 加密方式: PHPMailer::ENCRYPTION_STARTTLS (TLS) 或 PHPMailer::ENCRYPTION_SMTPS (SSL)
-define("SMTP_PORT", 587);                           // SMTP 端口: 587 (TLS) 或 465 (SSL)
+define("SMTP_PORT", 465);                           // SMTP 端口: 587 (TLS) 或 465 (SSL)
 // ======== END SMTP 服务器配置 ========
 
 //
