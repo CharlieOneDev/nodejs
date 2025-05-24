@@ -375,6 +375,7 @@ function sendMailWithPHPMailer($from, $to, $subject, $body_text, $attachments_da
     try {
         //Server settings
         $mail->SMTPDebug = SMTP::DEBUG_SERVER; // Enable verbose debug output for testing
+		$mail->Debugoutput = 'html'; // Debug output format
         //$mail->SMTPDebug = SMTP::DEBUG_OFF;     // Disable debug output for production
         $mail->isSMTP();                        // Send using SMTP
         $mail->Host       = SMTP_HOST;          // Set the SMTP server to send through
