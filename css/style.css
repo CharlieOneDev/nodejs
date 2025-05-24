@@ -442,19 +442,6 @@ ul.icon img:hover {
 
 /*トップページ内「更新情報・お知らせ」ブロック
 ---------------------------------------------------------------------------*/
-/*お知らせブロック*/
-dl {
-  display: grid;
-  grid-template-columns: 140px auto;
-  row-gap: 10px;
-  column-gap: 16px;
-}
-dl dt {
-  font-weight: bold;
-}
-dl dd {
-  margin: 0;
-}
 .old-news {
   display: none;
 }
