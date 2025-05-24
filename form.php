@@ -1,9 +1,13 @@
 <?php 
+// error_reporting (E_ALL & ~E_NOTICE & ~E_WARNING & ~E_STRICT & ~E_DEPRECATED); // 注释掉原来的这行
+error_reporting(E_ALL); // 显示所有错误
+ini_set('display_errors', 1); // 将错误输出到浏览器
+// ... 您的其余代码 ...
 error_reporting (E_ALL & ~E_NOTICE & ~E_WARNING & ~E_STRICT & ~E_DEPRECATED);
 //
-$mail_sys = "charlie.wong@daion.co.jp";	// 管理者のメールアドレス
+$mail_sys = "customer@daion.co.jp";	// 管理者のメールアドレス
 $from_name = "大恩家具株式会社";	// メール送信者の表示
-$from_mail = "charlie.wong@daion.co.jp";	// メール送信者のメールアドレス（返信先）
+$from_mail = "customer@daion.co.jp";	// メール送信者のメールアドレス（返信先）
 $user_mail = "item2";	// 利用者にメールを送る場合のメールアドレス項目
 //---
 $title = "お問い合わせフォーム";
@@ -14,7 +18,7 @@ $body = "お問い合わせ有難うございます。
 $subject_sys = "お問い合わせがありました\n";
 $body_sys = "\n";
 $footer = "\n------------
-サンプル株式会社
+大恩家具株式会社
 https://www.daion.co.jp/
 ------------
 ";
