@@ -21,19 +21,37 @@
   <h1 id="logo"><a href="index.html"><img src="images/logo-color.png" alt="大恩家具株式会社"></a></h1>
 </header>
 
+<!--PC用（801px以上端末）メニュー-->
 <nav id="menubar" class="nav-fix-pos">
 <ul class="inner">
-  <li><a href="index.html">HOME<span>ホーム</span></a></li>
-  <li><a href="about.html">ABOUT<span>当社について</span></a></li>
-  <li><a href="javascript:void(0)" class="cursor-default">WORKS<span>業務内容</span></a>
+<li><a href="index.html">HOME<span>ホーム</span></a></li>
+<li><a href="about.html">ABOUT<span>当社について</span></a></li>
+<li><a href="javascript:void(0)" class="cursor-default">WORKS<span>業務内容</span></a>
 	<ul class="ddmenu">
 	<li><a href="business_corporate.html">法人向け事業</a></li>
 	<li><a href="business_ec.html">ECソリューション事業</a></li>
 	<li><a href="business_promotion.html">プロモーション支援事業</a></li>
 	</ul>
-  </li>
-  <li><a href="recruit.html">RECRUIT<span>採用情報</span></a></li>
-  <li><a href="form.html">CONTACT<span>お問い合わせ</span></a></li>
+</li>
+<li><a href="recruit.html">RECRUIT<span>採用情報</span></a></li>
+<li><a href="form.html">CONTACT<span>お問い合わせ</span></a></li>
+</ul>
+</nav>
+
+<!--小さな端末用（800px以下端末）メニュー-->
+<nav id="menubar-s">
+<ul>
+<li><a href="index.html">HOME<span>ホーム</span></a></li>
+<li><a href="about.html">ABOUT<span>当社について</span></a></li>
+<li id="menubar_hdr2" class="close">WORKS<span>業務内容</span>
+	<ul id="menubar-s2">
+	<li><a href="business_corporate.html">法人向け事業</a></li>
+	<li><a href="business_ec.html">ECソリューション事業</a></li>
+	<li><a href="business_promotion.html">プロモーション支援事業</a></li>
+	</ul>
+</li>
+<li><a href="recruit.html">RECRUIT<span>採用情報</span></a></li>
+<li><a href="form.html">CONTACT<span>お問い合わせ</span></a></li>
 </ul>
 </nav>
 
@@ -131,6 +149,23 @@ ul.social-icons img {
   box-shadow: 0 0 5px rgba(0,0,0,0.1);
 }
 </style>
+
+<!--/#container-->
+
+<p class="nav-fix-pos-pagetop"><a href="#">↑</a></p>
+
+<!--メニュー開閉ボタン-->
+<div id="menubar_hdr" class="close"></div>
+
+<!--メニューの開閉処理-->
+<script>
+open_close("menubar_hdr", "menubar-s");
+</script>
+
+<!--「WORKS」の子メニュー-->
+<script>
+	open_close("menubar_hdr2", "menubar-s2");
+</script>
 
 </body>
 </html>
