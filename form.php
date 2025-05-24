@@ -4,6 +4,24 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
+function loadEnv($path) {
+    if (!file_exists($path)) return;
+    $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        if (strpos(trim($line), '#') === 0) continue; // 忽略注释
+        list($key, $value) = explode('=', $line, 2);
+        $key = trim($key);
+        $value = trim($value);
+        if (!array_key_exists($key, $_ENV)) {
+            $_ENV[$key] = $value;
+        }
+    }
+}
+
+// 加载 .env 文件
+loadEnv(__DIR__ . '/.env');
+
+
 // 根据您的安装方式引入 PHPMailer
 // 方式一: Composer
 // require 'vendor/autoload.php'; // 确保路径正确
@@ -16,11 +34,11 @@ require 'PHPMailer_src/SMTP.php';
 error_reporting (E_ALL & ~E_NOTICE & ~E_WARNING & ~E_STRICT & ~E_DEPRECATED);
 
 // ======== SMTP 服务器配置 (新添加) ========
-define("SMTP_HOST", 'smtp.gmail.com');       // 您的 SMTP 服务器地址
-define("SMTP_USERNAME", 'sukaboronet@gmail.com');     // 您的 SMTP 用户名
-define("SMTP_PASSWORD", 'qufd zdra ipfy rlww');     // 您的 SMTP 密码
-define("SMTP_SECURE", PHPMailer::ENCRYPTION_STARTTLS); // 加密方式: PHPMailer::ENCRYPTION_STARTTLS (TLS) 或 PHPMailer::ENCRYPTION_SMTPS (SSL)
-define("SMTP_PORT", 587);                           // SMTP 端口: 587 (TLS) 或 465 (SSL)
+define("SMTP_HOST", getenv("SMTP_HOST"));     // 您的 SMTP 服务器地址
+define("SMTP_USERNAME", getenv("SMTP_USERNAME"));   // 您的 SMTP 用户名
+define("SMTP_PASSWORD", getenv("SMTP_PASSWORD"));    // 您的 SMTP 密码
+define("SMTP_SECURE", getenv("SMTP_SECURE") === 'ssl' ? PHPMailer::ENCRYPTION_SMTPS : PHPMailer::ENCRYPTION_STARTTLS);  // 加密方式: PHPMailer::ENCRYPTION_STARTTLS (TLS) 或 PHPMailer::ENCRYPTION_SMTPS (SSL)
+define("SMTP_PORT", (int) getenv("SMTP_PORT"));  // SMTP 端口: 587 (TLS) 或 465 (SSL)
 // ======== END SMTP 服务器配置 ========
 
 //
