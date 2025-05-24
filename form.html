@@ -91,39 +91,6 @@
 </form>
 <!--フォームの情報はここまでです -->
 
-<!--
-  <script>
-    const form = document.getElementById('contactForm');
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const name = document.getElementById('name').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const message = document.getElementById('message').value.trim();
-
-      try {
-        const res = await fetch('https://nodejs-production-64e8.up.railway.app/api/contact', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, email, message })
-        });
-
-        const result = await res.json();
-        if (res.ok) {
-          alert(result.message);
-          form.reset();
-        } else {
-          alert(result.error || "送信に失敗しました");
-        }
-      } catch (err) {
-        console.error(err);
-        alert("エラーが発生しました。後でもう一度お試しください。");
-      }
-    });
-  </script>
-
- 不要なフォームの情報はここまでです -->
-
 </section>
 
 </div>
@@ -149,7 +116,7 @@
             </ul>
 			 <ul>
                 <li class="title">お問い合わせ</li>
-                <li><a href="mailto:customer@daion.co.jp">カスタマーセンター</a></li> 
+                <li><a href="form.html">カスタマーセンター</a></li> 
             </ul>
             <ul>
                 <li>

@@ -82,7 +82,7 @@
 <p>熟練職人による丁寧なものづくり<br>
 私たちは日本国内で設計・品質管理を行い、日本国内で製造しています。</p>
 </div>
-<p class="btn1"><a href="#">もっとみる</a></p>
+<p class="btn1"><a href="social.html">もっとみる</a></p>
 </div>
 
 <div class="list-column">
@@ -92,7 +92,7 @@
 <p>再生可能な素材や低排出の塗料を使用し、<br>
 地球と未来に配慮したサステナブルな家具をお届けします。</p>
 </div>
-<p class="btn1"><a href="#">もっとみる</a></p>
+<p class="btn1"><a href="social.html">もっとみる</a></p>
 </div>
 
 <div class="list-column">
@@ -102,7 +102,7 @@
 <p>引っ越し・結婚・一人暮らしなど、<br>
 人生の新しいスタートにぴったりの家具を取り揃えています。</p>
 </div>
-<p class="btn1"><a href="#">もっとみる</a></p>
+<p class="btn1"><a href="social.html">もっとみる</a></p>
 </div>
 
 </div>
@@ -111,19 +111,38 @@
 </section>
 
 <section id="new">
-
 <h2>News<span>お知らせ</span></h2>
-<dl>
-<dt>2025/05/23</dt>
-<dd>新ホームページは公開されます。<span class="newicon">NEW</span></dd>
-<dt>2023/12/15</dt>
-<dd>大恩家具株式会社の商号に変更</dd>
-<dt>2021/08/28</dt>
-<dd>株式会社エンジンの設立</dd>
-</dl>
-<p class="r">&raquo;&nbsp;<a href="#">過去ログ</a></p>
+<dl id="news-list">
+  <dt>2025/05/25</dt>
+  <dd>公式SNSアカウントは公開されます。<span class="newicon">NEW</span></dd>
+  <dt>2025/05/23</dt>
+  <dd>新ホームページは公開されます。</dd>
 
+  <dt class="old-news" style="display: none;">2023/12/15</dt>
+  <dd class="old-news" style="display: none;">大恩家具株式会社の商号に変更</dd>
+  <dt class="old-news" style="display: none;">2021/08/28</dt>
+  <dd class="old-news" style="display: none;">株式会社エンジンの設立</dd>
+</dl>
+
+<p class="r">
+  <a href="javascript:void(0);" id="toggle-news" onclick="toggleNews()">▶︎&nbsp;過去ログ</a>
+</p>
+
+<script>
+function toggleNews() {
+  const items = document.querySelectorAll(".old-news");
+  const toggleLink = document.getElementById("toggle-news");
+  const isHidden = items[0].style.display === "none";
+
+  items.forEach(item => {
+    item.style.display = isHidden ? "block" : "none";
+  });
+
+  toggleLink.innerHTML = isHidden ? "▲&nbsp;閉じる" : "▶︎&nbsp;過去ログ";
+}
+</script>
 </section>
+
 <!--/#new-->
 
 <section>
@@ -173,7 +192,7 @@
             </ul>
 			 <ul>
                 <li class="title">お問い合わせ</li>
-                <li><a href="mailto:customer@daion.co.jp">カスタマーセンター</a></li> 
+                <li><a href="form.html">カスタマーセンター</a></li> 
             </ul>
             <ul>
                 <li>
