@@ -42,7 +42,7 @@ define("SMTP_PORT", (int) getenv("SMTP_PORT"));  // SMTP 端口: 587 (TLS) 或 4
 // ======== END SMTP 服务器配置 ========
 
 //
-$mail_sys = "customer@daion.co.jp"; // 管理者のメールアドレス
+$mail_sys = getenv("SMTP_USERNAME"); // 管理者のメールアドレス
 $from_name = "大恩家具株式会社";     // メール送信者の表示
 $from_mail = getenv("SMTP_USERNAME");     // メール送信者のメールアドレス（SMTP服务商可能要求与认证用户一致或已验证）
 $user_mail = "item2";   // 利用者にメールを送る場合のメールアドレス項目
