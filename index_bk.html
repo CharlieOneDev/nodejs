@@ -14,31 +14,6 @@
 <script src="js/fixmenu.js"></script>
 <script src="js/fixmenu_pagetop.js"></script>
 <script src="js/ddmenu_min.js"></script>
-<!-- ▼YouTube動画をレスポンシブ対応にするためのCSSを追加 -->
-<style>
-/* ↓ サイズと配置を指定する外枠のスタイル */
-.video-wrapper {
-    max-width: 50%; /* 幅を半分に */
-    margin: 0 auto 20px auto; /* 上下左右の余白と中央揃え */
-}
-
-/* ↓ アスペクト比を維持する内枠のスタイル */
-.video-container {
-    position: relative;
-    padding-bottom: 56.25%; /* 16:9のアスペクト比 */
-    height: 0;
-    overflow: hidden;
-}
-
-.video-container iframe {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-}
-</style>
-<!-- ▲ここまで追加 -->
 </head>
 
 <body class="home">
@@ -92,18 +67,6 @@
 <div id="contents">
 
 <div class="inner">
-
-<!-- ▼ここからYouTube動画のセクションを追加 -->
-<section>
-    <h2>BRAND MOVIE<span>大恩家具ブランドムービー</span></h2>
-    <!-- ↓ サイズと配置を指定する外枠を追加 -->
-    <div class="video-wrapper">
-        <div class="video-container">
-            <iframe src="https://www.youtube.com/watch?v=mV5wdTmGHWI" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-        </div>
-    </div>
-</section>
-<!-- ▲ここまで追加 -->
 
 <section>
 
