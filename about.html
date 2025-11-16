@@ -14,6 +14,34 @@
 <script src="js/fixmenu.js"></script>
 <script src="js/fixmenu_pagetop.js"></script>
 <script src="js/ddmenu_min.js"></script>
+<style>
+    /* ▼▼▼ 本页面追加的布局样式 ▼▼▼ */
+    .about-section > p.intro-text { font-size: 1rem; line-height: 2; }
+    .section-title-dotted {
+        font-size: 1.8em; font-weight: bold; color: #333; margin-top: 50px;
+        margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px dotted #ccc;
+    }
+    .location-container { display: flex; gap: 30px; align-items: flex-start; }
+    .location-info { flex: 0 0 40%; max-width: 450px; }
+    .location-map { flex: 1; }
+    .location-info table {
+        width: 100%; border-collapse: collapse;
+    }
+    .location-info th, .location-info td {
+        border: 1px solid #e0e0e0; padding: 15px; text-align: left; vertical-align: middle;
+        line-height: 1.8; /* 调整行高使文字更整齐 */
+    }
+    .location-info th {
+        background-color: #f7f7f7; width: 100px; font-weight: bold; color: #555;
+    }
+    .exterior-photo-container img { width: 100%; height: auto; border: 1px solid #ddd; }
+
+    @media screen and (max-width:800px) {
+        .location-container { flex-direction: column; gap: 25px; }
+        .location-info { max-width: 100%; }
+    }
+    /* ▲▲▲ 样式结束 ▲▲▲ */
+</style>
 </head>
 
 <body>
@@ -24,12 +52,12 @@
 <h1 id="logo"><a href="index.html"><img src="images/logo-color.png" alt="ABOUT US"></a></h1>
 </header>
 
-
 <!--PC用（801px以上端末）メニュー-->
 <nav id="menubar" class="nav-fix-pos">
 <ul class="inner">
 <li><a href="index.html">HOME<span>ホーム</span></a></li>
 <li><a href="about.html">ABOUT<span>当社について</span></a></li>
+<li><a href="production.html">PRODUCTION<span>製品一覧</span></a></li>
 <li><a href="javascript:void(0)" class="cursor-default">WORKS<span>業務内容</span></a>
 	<ul class="ddmenu">
 	<li><a href="business_corporate.html">法人向け事業</a></li>
@@ -47,6 +75,7 @@
 <ul>
 <li><a href="index.html">HOME<span>ホーム</span></a></li>
 <li><a href="about.html">ABOUT<span>当社について</span></a></li>
+<li><a href="production.html">PRODUCTION<span>製品一覧</span></a></li>
 <li id="menubar_hdr2" class="close">WORKS<span>業務内容</span>
 	<ul id="menubar-s2">
 	<li><a href="business_corporate.html">法人向け事業</a></li>
@@ -70,19 +99,58 @@
 </section>
 
 <section class="about-section">
+<h2 style="font-size: 24px;">次元を越えて、あなたの暮らしへ</h2>
+<p class="intro-text">
+  大恩家具は、暮らしに自然と溶け込む心地よさを大切に、  
+  毎日を豊かにする家具づくりに取り組んでいます。  
+  家庭用から業務用、特注家具まで、空間やスタイルに合わせた  
+  幅広いご提案が可能です。長く寄り添える品質と使いやすさを追求し、  
+  お客様一人ひとりの理想の暮らしをかたちにしていきます。
+</p>
 
-  <h2>暮らしに寄り添う家具づくり</h2>
+<h3 class="section-title-dotted">事業所</h3>
+<div class="location-container">
+    <div class="location-info">
+        <table>
+            <tr>
+                <th>事業所名</th>
+                <td>
+                    一木本店
+                </td>
+            </tr>
+            <tr>
+                <th>業務内容</th>
+                <td>家具販売、EC業務</td>
+            </tr>
+            <tr>
+                <th>最寄り駅</th>
+                <td>西鉄バス<br>「南町(大川市)」<br>徒歩1分</td>
+            </tr>
+            <tr>
+                <th></th>
+                <td>西鉄天神大牟田線「矢加部駅」車11分</td>
+            </tr>
+        </table>
+    </div>
+    <div class="location-map">
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3338.9826191872976!2d130.37086399999998!3d33.1883267!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4a3b7d93bd4922e9%3A0x12f4248379bf044b!2z5aSn5oGp5a625YW35qCq5byP5Lya56S-!5e0!3m2!1sja!2sjp!4v1751160764994!5m2!1sja!2sjp" width="100%" height="320" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    </div>
+</div>
+
+<div class="exterior-photo-container">
+    <img src="images/daion-factory.jpg" alt="一木本店 外観">
+</div>
+
+
+<div class="section-block" style="margin-top: 50px;">
+  <h3>企業理念</h3>
   <p>
-    大恩家具は、「毎日の暮らしを豊かにする家具」をコンセプトに、日本国内での製造にこだわり、
-    高品質で長く愛される家具をつくり続けています。家庭用から業務用、特注家具まで、
-    お客様のニーズに応じた柔軟な対応を行っています。
+    私たちは、家具が生み出す“豊かな時間”を大切にし、  
+    誰にとっても心地よい空間づくりに貢献する企業を目指しています。  
+    丁寧なものづくりと誠実な姿勢を通して、お客様や社会との  
+    信頼を積み重ね、長く愛されるブランドであり続けます。
   </p>
-
-  <div class="section-block">
-    <h3>企業理念</h3>
-    <p>環境に優しく、持続可能なものづくりを目指し、素材選びから製造工程まで環境配慮型の取り組みを進めています。
-    私たちは、お客様の暮らしを支える家具を通して、社会や地域に貢献していく企業を目指しています。</p>
-  </div>
+</div>
 
   <div class="section-block">
     <h3>事業内容</h3>
@@ -101,11 +169,6 @@
       <tr><th>所在地</th><td>福岡県大川市大字一木１０５０番地４</td></tr>
       <tr><th>代表者</th><td>黄 義恩</td></tr>
     </table>
-  <!-- ▼ Google Map ▼ -->
-  <div style="margin-top: 25px;">
-    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3338.9826191872976!2d130.37086399999998!3d33.1883267!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4a3b7d93bd4922e9%3A0x12f4248379bf044b!2z5aSn5oGp5a625YW35qCq5byP5Lya56S-!5e0!3m2!1sja!2sjp!4v1751160764994!5m2!1sja!2sjp" width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-  </div>
-  <!-- ▲ Google Map ▲ -->
   </div>
 
 </section>
@@ -118,6 +181,7 @@
 <!--/#contents-->
 
 <footer>
+    <!-- ... 页脚部分保持不变 ... -->
     <div class="footer-container">
         <div id="footermenu" class="inner">
             <ul>
@@ -155,7 +219,7 @@
                 </ul>
             </div>
         </div></div><div id="copyright">
-        <p class="slogan">家具の次世代へ、Daion！</p> 
+        <p class="slogan">次元を越えて、あなたの暮らしへ</p> 
         <small>Copyright&copy; <a href="/">大恩家具株式会社</a> All Rights Reserved.</small>
     </div>
 </footer>
