@@ -81,11 +81,24 @@ $from_mail = getenv("SMTP_USERNAME");     // メール送信者のメールア�
 $user_mail = "item2";   // 利用者にメールを送る場合のメールアドレス項目
 //---
 $title = "お問い合わせフォーム";
-$subject = "お問い合わせ有難うございます\n"; // \n 在 PHPMailer 中对于纯文本邮件是换行，HTML邮件中是 <br>
-$body = "お問い合わせ有難うございます。\n以下の内容で承りました。\n\n";
-$subject_sys = "お問い合わせがありました\n";
-$body_sys = "ウェブサイトから新しいお問い合わせがありました。\n\n"; // 修改一下，更清晰
-$footer = "\n------------\n大恩家具株式会社\nhttps://www.daion.co.jp/\n------------\n";
+
+// --- 这是给客户的自动回复邮件 ---
+$subject = "【大恩家具 NEMON】お問い合わせありがとうございます"; // 邮件标题
+$body = "この度は、大恩家具 NEMONへお問い合わせいただき、誠にありがとうございます。\n"
+      . "こちらは、お問い合わせ内容の受信をお知らせする自動返信メールです。\n\n"
+      . "以下の内容で、お客様からのお問い合わせを確かに承りました。\n";
+
+// --- 这是给您自己（管理员）的通知邮件 ---
+$subject_sys = "【要対応】ウェブサイトより新しいお問い合わせがありました"; // 邮件标题
+$body_sys = "ウェブサイトのお問い合わせフォームから、新しいメッセージが届きました。\n"
+          . "下記内容をご確認の上、速やかにご対応をお願いいたします。\n\n";
+$footer = "\n---\n"
+        . "大恩家具株式会社\n"
+        . "公式サイト： https://www.daion.co.jp/\n" 
+        . "NEMON 通販ブランド\n\n"
+        . "通販サイト： https://www.nemon.co.jp/\n\n"
+        . "〒831-0034 福岡県大川市大字一木１０５０番地４\n"
+        . "---\n";
 //------------------------------------------------
 
 /*
@@ -342,12 +355,28 @@ if (!isset($_REQUEST["mode"])) {
         }
     }
 
-    if (isset($_SESSION["captcha"])) { // 清理captcha session
+if (isset($_SESSION["captcha"])) { // 清理captcha session
         unset($_SESSION["captcha"]);
     }
 
-    $full_mail_body_for_user = $body . $mail_body_content . $footer;
-    $full_mail_body_for_admin = $body_sys . $mail_body_content . $footer;
+    // 从$form数组中获取客户姓名 (item1是姓名)
+    $customer_name = isset($form['item1']) ? $form['item1'] : "お客様";
+
+    // 邮件正文的附加说明
+    $additional_notes = "\n内容を確認の上、担当者より改めてご連絡させていただきます。\n"
+                      . "通常、1〜2営業日以内にご返信いたしますので、恐れ入りますが、今しばらくお待ちいただけますようお願い申し上げます。\n\n"
+                      . "万が一、数日経っても弊社からの返信がない場合は、\n"
+                      . "メールシステムの不具合の可能性もございますので、大変お手数ですが再度お問い合わせいただけますと幸いです。\n";
+
+    // 定义分割线
+    $divider = "------------------------------------------\n";
+
+    // --- 重新组合给客户的完整邮件 ---
+    // 格式: [姓名]様 + [问候语] + [分割线] + [表单内容] + [附加说明] + [页脚]
+    $full_mail_body_for_user = $customer_name . "様\n\n" . $body . $divider . $mail_body_content . $divider . $additional_notes . $footer;
+
+    // --- 重新组合给管理员的完整邮件 ---
+    $full_mail_body_for_admin = $body_sys . $divider . $mail_body_content . $divider . $footer;
 
     $attachments_for_phpmailer = array();
     foreach ($form_input as $val) {
@@ -369,15 +398,13 @@ if (!isset($_REQUEST["mode"])) {
 
 
     if ($mail_sys) {
-        // 管理者向け
-        // echo "Sending to admin: $mail_sys <br>"; // Debug
-        sendMailWithPHPMailer($from_mail, $mail_sys, $subject_sys, $full_mail_body_for_admin, $attachments_for_phpmailer, $from_name);
+        // 管理者向け — 优先使用 Mailgun（如已配置），否则回退到 PHPMailer/其他
+        sendMailPreferMailgun($from_mail, $mail_sys, $subject_sys, $full_mail_body_for_admin, $attachments_for_phpmailer, $from_name);
     }
     //
     if ($user_email_address) {
-        // 利用者向け
-        // echo "Sending to user: $user_email_address <br>"; // Debug
-        sendMailWithPHPMailer($from_mail, $user_email_address, $subject, $full_mail_body_for_user, $attachments_for_phpmailer, $from_name);
+        // 利用者向け — 优先使用 Mailgun（如已配置），否则回退到 PHPMailer/其他
+        sendMailPreferMailgun($from_mail, $user_email_address, $subject, $full_mail_body_for_user, $attachments_for_phpmailer, $from_name);
     }
     //
     $current_mode = "finish";
@@ -594,7 +621,7 @@ function sendMailWithSendGrid($from, $to, $subject, $body_text, $from_name_displ
  * Fallback: send mail via Mailgun HTTP API v3
  * Requires env `MAILGUN_API_KEY` and `MAILGUN_DOMAIN`.
  */
-function sendMailWithMailgun($from, $to, $subject, $body_text, $from_name_display = null, $api_key = null, $domain = null)
+function sendMailWithMailgun($from, $to, $subject, $body_text, $from_name_display = null, $api_key = null, $domain = null, $attachments = array())
 {
     if ($api_key === null) $api_key = getenv('MAILGUN_API_KEY');
     if ($domain === null) $domain = getenv('MAILGUN_DOMAIN');
@@ -613,12 +640,30 @@ function sendMailWithMailgun($from, $to, $subject, $body_text, $from_name_displa
         'text' => $body_text,
     ];
 
+    $tmpfiles = array();
+    // If attachments provided as array of arrays with base64_content, filename, filetype
+    if (!empty($attachments) && is_array($attachments)) {
+        foreach ($attachments as $i => $att) {
+            if (isset($att['base64_content']) && isset($att['filename'])) {
+                $data = base64_decode($att['base64_content']);
+                $tmp = tempnam(sys_get_temp_dir(), 'mgatt_');
+                if ($tmp !== false) {
+                    file_put_contents($tmp, $data);
+                    $tmpfiles[] = $tmp;
+                    $cfile = new CURLFile($tmp, isset($att['filetype']) ? $att['filetype'] : mime_content_type($tmp), $att['filename']);
+                    // Mailgun accepts multiple 'attachment' fields
+                    $post['attachment[' . $i . ']'] = $cfile;
+                }
+            }
+        }
+    }
+
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_USERPWD, 'api:' . $api_key);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
 
     $resp = curl_exec($ch);
     $errno = curl_errno($ch);
@@ -628,13 +673,37 @@ function sendMailWithMailgun($from, $to, $subject, $body_text, $from_name_displa
 
     if ($errno !== 0) {
         error_log('Mailgun curl error: ' . $err . ' (errno=' . $errno . ')');
+        // cleanup
+        foreach ($tmpfiles as $f) @unlink($f);
         return false;
     }
+    // cleanup
+    foreach ($tmpfiles as $f) @unlink($f);
     if ($http_code >= 200 && $http_code < 300) {
         return true;
     }
     error_log('Mailgun API failure: HTTP ' . $http_code . ' resp: ' . $resp);
     return false;
+}
+
+/**
+ * Prefer Mailgun for sending: try Mailgun first (if configured), otherwise fall back to SMTP (PHPMailer) and existing HTTP fallbacks.
+ */
+function sendMailPreferMailgun($from, $to, $subject, $body_text, $attachments = array(), $from_name_display = null)
+{
+    $mailgun_key = getenv('MAILGUN_API_KEY');
+    $mailgun_domain = getenv('MAILGUN_DOMAIN');
+    if (!empty($mailgun_key) && !empty($mailgun_domain)) {
+        error_log('Attempting to send via Mailgun for ' . $to);
+        if (sendMailWithMailgun($from, $to, $subject, $body_text, $from_name_display, $mailgun_key, $mailgun_domain, $attachments)) {
+            error_log('Mailgun send succeeded for ' . $to);
+            return true;
+        }
+        error_log('Mailgun send failed for ' . $to . ', falling back to SMTP/other providers');
+    }
+
+    // If Mailgun not configured or failed, attempt SMTP via PHPMailer (which has its own fallbacks)
+    return sendMailWithPHPMailer($from, $to, $subject, $body_text, $attachments, $from_name_display);
 }
 
 // 原有的 sendmail 函数不再使用，可以删除或注释掉
