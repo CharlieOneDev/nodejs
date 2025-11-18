@@ -490,8 +490,76 @@ function sendMailWithPHPMailer($from, $to, $subject, $body_text, $attachments_da
         // echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo} (To: $to)<br>"; // For debugging
         // 记录错误日志而不是直接输出到页面，对用户更友好
         error_log("PHPMailer Error for $to: " . $mail->ErrorInfo);
+
+        // 如果配置了备用的 HTTP 邮件服务（例如 SendGrid），在 SMTP 失败时回退
+        $sendgrid_key = getenv('SENDGRID_API_KEY');
+        if (!empty($sendgrid_key)) {
+            error_log('PHPMailer failed; attempting SendGrid fallback for ' . $to);
+            $fallback = sendMailWithSendGrid($from, $to, $subject, $body_text, $from_name_display, $sendgrid_key);
+            if ($fallback) {
+                error_log('SendGrid fallback succeeded for ' . $to);
+                return true;
+            } else {
+                error_log('SendGrid fallback failed for ' . $to);
+            }
+        }
+
         return false;
     }
+}
+
+/**
+ * Fallback: send mail via SendGrid Web API v3
+ * Requires env `SENDGRID_API_KEY` set to a valid API key.
+ */
+function sendMailWithSendGrid($from, $to, $subject, $body_text, $from_name_display = null, $api_key = null)
+{
+    if ($api_key === null) $api_key = getenv('SENDGRID_API_KEY');
+    if (empty($api_key)) {
+        error_log('SendGrid API key not provided');
+        return false;
+    }
+
+    $payload = [
+        'personalizations' => [[
+            'to' => [[ 'email' => trim($to) ]],
+            'subject' => $subject,
+        ]],
+        'from' => [
+            'email' => $from,
+            'name' => ($from_name_display ?: $from),
+        ],
+        'content' => [[
+            'type' => 'text/plain',
+            'value' => $body_text,
+        ]],
+    ];
+
+    $ch = curl_init('https://api.sendgrid.com/v3/mail/send');
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Authorization: Bearer ' . $api_key,
+        'Content-Type: application/json'
+    ]);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+    curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+
+    $resp = curl_exec($ch);
+    $errno = curl_errno($ch);
+    $err = curl_error($ch);
+    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($errno !== 0) {
+        error_log('SendGrid curl error: ' . $err . ' (errno=' . $errno . ')');
+        return false;
+    }
+    if ($http_code >= 200 && $http_code < 300) {
+        return true;
+    }
+    error_log('SendGrid API failure: HTTP ' . $http_code . ' resp: ' . $resp);
+    return false;
 }
 
 // 原有的 sendmail 函数不再使用，可以删除或注释掉

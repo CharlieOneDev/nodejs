@@ -1,15 +1,11 @@
 <?php
-// SMTP 连接诊断脚本
-// 用法：在部署后通过浏览器访问该文件，或在有 PHP CLI 的环境中运行 `php diagnose_smtp.php`。
+// SMTP 连接诊断脚本（增强版）
+// 现在会同时测试端口 587 (STARTTLS) 和 465 (SSL)，并输出到页面与 error_log。
 
-// 尝试从环境或 .env 读取（如果使用 .env，请确保 loadEnvWithPutenv 已在 form.php 中运行）
+// 环境读取（如果需要，请先在 form.php 中确保 .env 已导入到 getenv）
 $host = getenv('SMTP_HOST') ?: 'smtp.zoho.com';
 $user = getenv('SMTP_USERNAME') ?: '[not set]';
-$port = (int) (getenv('SMTP_PORT') ?: 0);
-$secure = strtolower(getenv('SMTP_SECURE') ?: '');
-if ($port === 0) {
-    $port = ($secure === 'ssl') ? 465 : 587;
-}
+$secure_env = strtolower(getenv('SMTP_SECURE') ?: '');
 
 function println($s) {
     echo htmlspecialchars($s, ENT_QUOTES, 'UTF-8') . "\n";
@@ -18,8 +14,7 @@ function println($s) {
 
 println("SMTP diagnostic starting at " . date('c'));
 println("Host: $host");
-println("Port: $port");
-println("Secure: $secure");
+println("Secure (env): $secure_env");
 println("User: " . ($user === '[not set]' ? '[not set]' : preg_replace('/(.).+(.+)@/', '$1***$2@', $user)));
 
 // DNS resolution
@@ -31,43 +26,48 @@ if ($ip === $host) {
 }
 
 $timeout = 10; // seconds
-
-// 1) Basic TCP connect test
-println("\n1) Basic TCP connection test (fsockopen)");
-$errno = 0; $errstr = '';
-$fp = @fsockopen($host, $port, $errno, $errstr, $timeout);
-if ($fp) {
-    println("fsockopen: connected to $host:$port");
-    $banner = fgets($fp, 512);
-    if ($banner) println("banner: " . trim($banner));
-    fclose($fp);
-} else {
-    println("fsockopen: failed to connect to $host:$port  (errno=$errno) $errstr");
-}
-
-// 2) stream_socket_client (tcp)
-println("\n2) stream_socket_client tcp:// connect");
-$remote = sprintf('tcp://%s:%d', $host, $port);
 $ctx = stream_context_create([]);
-$s = @stream_socket_client($remote, $errno, $errstr, $timeout, STREAM_CLIENT_CONNECT, $ctx);
-if ($s) {
-    println("stream_socket_client: connected to $remote");
-    stream_set_timeout($s, 2);
-    $line = fgets($s);
-    if ($line) println("banner: " . trim($line));
-    fclose($s);
-} else {
-    println("stream_socket_client tcp: failed to connect to $remote (errno=$errno) $errstr");
-}
 
-// 3) If secure=ssl, try ssl://
-if ($secure === 'ssl') {
-    println("\n3) stream_socket_client ssl:// connect (for port 465)");
+// ports to test (prefer 587 then 465)
+$ports = [587, 465];
+
+foreach ($ports as $port) {
+    println("\n===== Testing port $port =====");
+
+    // 1) fsockopen
+    println("1) fsockopen TCP test to $host:$port");
+    $errno = 0; $errstr = '';
+    $fp = @fsockopen($host, $port, $errno, $errstr, $timeout);
+    if ($fp) {
+        println("fsockopen: connected to $host:$port");
+        $banner = @fgets($fp, 512);
+        if ($banner) println("banner: " . trim($banner));
+        fclose($fp);
+    } else {
+        println("fsockopen: failed to connect to $host:$port  (errno=$errno) $errstr");
+    }
+
+    // 2) stream_socket_client tcp://
+    println("\n2) stream_socket_client tcp:// connect to $host:$port");
+    $remote = sprintf('tcp://%s:%d', $host, $port);
+    $s = @stream_socket_client($remote, $errno, $errstr, $timeout, STREAM_CLIENT_CONNECT, $ctx);
+    if ($s) {
+        println("stream_socket_client tcp: connected to $remote");
+        stream_set_timeout($s, 2);
+        $line = @fgets($s);
+        if ($line) println("banner: " . trim($line));
+        fclose($s);
+    } else {
+        println("stream_socket_client tcp: failed to connect to $remote (errno=$errno) $errstr");
+    }
+
+    // 3) Try ssl:// for this port (useful for 465; for 587 this will usually fail but we test)
+    println("\n3) stream_socket_client ssl:// connect to $host:$port");
     $remote_ssl = sprintf('ssl://%s:%d', $host, $port);
     $s2 = @stream_socket_client($remote_ssl, $errno, $errstr, $timeout, STREAM_CLIENT_CONNECT, $ctx);
     if ($s2) {
         println("ssl connect: connected to $remote_ssl");
-        $line = fgets($s2);
+        $line = @fgets($s2);
         if ($line) println("banner: " . trim($line));
         fclose($s2);
     } else {
@@ -77,7 +77,7 @@ if ($secure === 'ssl') {
 
 println("\nDiagnostic finished.");
 
-// Keep the script quiet when called by CLI — exit appropriately
+// CLI exit
 if (php_sapi_name() === 'cli') exit(0);
 
 ?>
