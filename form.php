@@ -504,6 +504,20 @@ function sendMailWithPHPMailer($from, $to, $subject, $body_text, $attachments_da
             }
         }
 
+        // 如果 SendGrid 不可用，尝试 Mailgun 回退（需要设置 MAILGUN_API_KEY 和 MAILGUN_DOMAIN）
+        $mailgun_key = getenv('MAILGUN_API_KEY');
+        $mailgun_domain = getenv('MAILGUN_DOMAIN');
+        if (!empty($mailgun_key) && !empty($mailgun_domain)) {
+            error_log('PHPMailer failed; attempting Mailgun fallback for ' . $to . ' using domain ' . $mailgun_domain);
+            $fallback2 = sendMailWithMailgun($from, $to, $subject, $body_text, $from_name_display, $mailgun_key, $mailgun_domain);
+            if ($fallback2) {
+                error_log('Mailgun fallback succeeded for ' . $to);
+                return true;
+            } else {
+                error_log('Mailgun fallback failed for ' . $to);
+            }
+        }
+
         return false;
     }
 }
@@ -559,6 +573,53 @@ function sendMailWithSendGrid($from, $to, $subject, $body_text, $from_name_displ
         return true;
     }
     error_log('SendGrid API failure: HTTP ' . $http_code . ' resp: ' . $resp);
+    return false;
+}
+
+/**
+ * Fallback: send mail via Mailgun HTTP API v3
+ * Requires env `MAILGUN_API_KEY` and `MAILGUN_DOMAIN`.
+ */
+function sendMailWithMailgun($from, $to, $subject, $body_text, $from_name_display = null, $api_key = null, $domain = null)
+{
+    if ($api_key === null) $api_key = getenv('MAILGUN_API_KEY');
+    if ($domain === null) $domain = getenv('MAILGUN_DOMAIN');
+    if (empty($api_key) || empty($domain)) {
+        error_log('Mailgun credentials or domain not provided');
+        return false;
+    }
+
+    $api_base = getenv('MAILGUN_API_BASE') ?: 'api.mailgun.net';
+    $url = 'https://' . $api_base . '/v3/' . $domain . '/messages';
+
+    $post = [
+        'from' => ($from_name_display ? ($from_name_display . ' <' . $from . '>') : $from),
+        'to' => trim($to),
+        'subject' => $subject,
+        'text' => $body_text,
+    ];
+
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_USERPWD, 'api:' . $api_key);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+
+    $resp = curl_exec($ch);
+    $errno = curl_errno($ch);
+    $err = curl_error($ch);
+    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($errno !== 0) {
+        error_log('Mailgun curl error: ' . $err . ' (errno=' . $errno . ')');
+        return false;
+    }
+    if ($http_code >= 200 && $http_code < 300) {
+        return true;
+    }
+    error_log('Mailgun API failure: HTTP ' . $http_code . ' resp: ' . $resp);
     return false;
 }
 
