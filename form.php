@@ -424,21 +424,59 @@ echo $html; // 干净地输出
  */
 function sendMailWithPHPMailer($from, $to, $subject, $body_text, $attachments_data = array(), $from_name_display = null)
 {
-    $mail = new PHPMailer(true); // Enable exceptions
+    // Quick connectivity check before instantiating PHPMailer to avoid long blocking timeouts
+    $connect_timeout = (int) (getenv('SMTP_CONNECT_TIMEOUT') ?: 5);
+    if (empty(SMTP_HOST) || empty(SMTP_USERNAME) || empty(SMTP_PASSWORD) || SMTP_PORT === 0) {
+        error_log("PHPMailer: SMTP settings incomplete, skipping SMTP and attempting HTTP fallbacks. Host=" . (SMTP_HOST ?: '[empty]') . " User=" . (SMTP_USERNAME ?: '[empty]') . " Port=" . SMTP_PORT);
+        // Try HTTP fallbacks immediately
+        $sendgrid_key = getenv('SENDGRID_API_KEY');
+        if (!empty($sendgrid_key)) {
+            error_log('Attempting SendGrid fallback for ' . $to);
+            if (sendMailWithSendGrid($from, $to, $subject, $body_text, $from_name_display, $sendgrid_key)) return true;
+            error_log('SendGrid fallback failed for ' . $to);
+        }
+        $mailgun_key = getenv('MAILGUN_API_KEY');
+        $mailgun_domain = getenv('MAILGUN_DOMAIN');
+        if (!empty($mailgun_key) && !empty($mailgun_domain)) {
+            error_log('Attempting Mailgun fallback for ' . $to);
+            if (sendMailWithMailgun($from, $to, $subject, $body_text, $from_name_display, $mailgun_key, $mailgun_domain)) return true;
+            error_log('Mailgun fallback failed for ' . $to);
+        }
+        return false;
+    }
 
+    $remote = sprintf('tcp://%s:%d', SMTP_HOST, SMTP_PORT);
+    $fp = @stream_socket_client($remote, $errno, $errstr, $connect_timeout);
+    if (!$fp) {
+        error_log(sprintf("SMTP host %s:%s not reachable (connect errno=%s %s). Skipping SMTP and attempting HTTP fallbacks.", SMTP_HOST, SMTP_PORT, $errno, $errstr));
+        // Try HTTP fallbacks immediately
+        $sendgrid_key = getenv('SENDGRID_API_KEY');
+        if (!empty($sendgrid_key)) {
+            error_log('Attempting SendGrid fallback for ' . $to);
+            if (sendMailWithSendGrid($from, $to, $subject, $body_text, $from_name_display, $sendgrid_key)) return true;
+            error_log('SendGrid fallback failed for ' . $to);
+        }
+        $mailgun_key = getenv('MAILGUN_API_KEY');
+        $mailgun_domain = getenv('MAILGUN_DOMAIN');
+        if (!empty($mailgun_key) && !empty($mailgun_domain)) {
+            error_log('Attempting Mailgun fallback for ' . $to);
+            if (sendMailWithMailgun($from, $to, $subject, $body_text, $from_name_display, $mailgun_key, $mailgun_domain)) return true;
+            error_log('Mailgun fallback failed for ' . $to);
+        }
+        return false;
+    } else {
+        fclose($fp);
+    }
+
+    $mail = new PHPMailer(true); // Enable exceptions
     try {
         //Server settings
-        // Allow controlling SMTP debug level via env `SMTP_DEBUG` (0 = off, 1 = client, 2 = server)
         $mail->SMTPDebug = (int) (getenv('SMTP_DEBUG') ?: 0);
         $mail->Debugoutput = 'error_log'; // send debug output to PHP error_log so it appears in Railway logs
 
         $mail->isSMTP();                        // Send using SMTP
-
-        // Basic runtime validation so we fail fast with clear logs if env isn't configured
-        if (empty(SMTP_HOST) || empty(SMTP_USERNAME) || empty(SMTP_PASSWORD) || SMTP_PORT === 0) {
-            error_log("PHPMailer: SMTP settings incomplete, aborting send. Host=" . (SMTP_HOST ?: '[empty]') . " User=" . (SMTP_USERNAME ?: '[empty]') . " Port=" . SMTP_PORT);
-            return false;
-        }
+        // Set a reasonable timeout for SMTP operations to avoid long blocking
+        $mail->Timeout = (int) (getenv('SMTP_TIMEOUT') ?: 10);
 
         $mail->Host       = SMTP_HOST;          // Set the SMTP server to send through
         $mail->SMTPAuth   = true;               // Enable SMTP authentication
@@ -447,44 +485,30 @@ function sendMailWithPHPMailer($from, $to, $subject, $body_text, $attachments_da
         $mail->SMTPSecure = SMTP_SECURE;        // Enable TLS/SSL encryption
         $mail->Port       = SMTP_PORT;          // TCP port to connect to; typically 587 (TLS) or 465 (SSL)
 
-        // Production: do not relax TLS verification. Keep strict certificate checks.
-        // If you need to debug TLS issues temporarily, re-enable SMTPOptions locally.
-
         //Recipients
-        // 使用传入的 $from 和 $from_name_display
         $mail->setFrom($from, ($from_name_display ?: $from)); // $from_name_display 为空则使用 $from 作为显示名
         $mail->addAddress(trim($to));           // Add a recipient
-
-        // $mail->addReplyTo('info@example.com', 'Information'); // 可选：设置回复地址
-        // $mail->addCC('cc@example.com');
-        // $mail->addBCC('bcc@example.com');
 
         //Attachments
         if (!empty($attachments_data)) {
             foreach ($attachments_data as $att) {
                 if (isset($att['base64_content']) && isset($att['filename']) && isset($att['filetype'])) {
-                    // PHPMailer的addStringAttachment需要原始二进制数据，不是base64
                     $mail->addStringAttachment(base64_decode($att['base64_content']), $att['filename'], 'base64', $att['filetype']);
                 }
             }
         }
 
         //Content
-        $mail->isHTML(false); //  当前邮件内容是纯文本。如果需要HTML，设为true，并修改$body_text的格式
-        $mail->CharSet = 'UTF-8'; // 强烈推荐使用UTF-8
+        $mail->isHTML(false);
+        $mail->CharSet = 'UTF-8';
         $mail->Subject = $subject;
-        $mail->Body    = $body_text; // \n 会被视为换行
-        // $mail->AltBody = 'This is the body in plain text for non-HTML mail clients'; // 如果isHTML(true)
+        $mail->Body    = $body_text;
 
         $mail->send();
-        // echo 'Message has been sent to ' . $to . '<br>'; // For debugging
         return true;
     } catch (Exception $e) {
-        // echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo} (To: $to)<br>"; // For debugging
-        // 记录错误日志而不是直接输出到页面，对用户更友好
         error_log("PHPMailer Error for $to: " . $mail->ErrorInfo);
-
-        // 如果配置了备用的 HTTP 邮件服务（例如 SendGrid），在 SMTP 失败时回退
+        // Fallbacks: SendGrid then Mailgun
         $sendgrid_key = getenv('SENDGRID_API_KEY');
         if (!empty($sendgrid_key)) {
             error_log('PHPMailer failed; attempting SendGrid fallback for ' . $to);
@@ -496,8 +520,6 @@ function sendMailWithPHPMailer($from, $to, $subject, $body_text, $attachments_da
                 error_log('SendGrid fallback failed for ' . $to);
             }
         }
-
-        // 如果 SendGrid 不可用，尝试 Mailgun 回退（需要设置 MAILGUN_API_KEY 和 MAILGUN_DOMAIN）
         $mailgun_key = getenv('MAILGUN_API_KEY');
         $mailgun_domain = getenv('MAILGUN_DOMAIN');
         if (!empty($mailgun_key) && !empty($mailgun_domain)) {
@@ -510,7 +532,6 @@ function sendMailWithPHPMailer($from, $to, $subject, $body_text, $attachments_da
                 error_log('Mailgun fallback failed for ' . $to);
             }
         }
-
         return false;
     }
 }
