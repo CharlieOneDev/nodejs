@@ -447,15 +447,8 @@ function sendMailWithPHPMailer($from, $to, $subject, $body_text, $attachments_da
         $mail->SMTPSecure = SMTP_SECURE;        // Enable TLS/SSL encryption
         $mail->Port       = SMTP_PORT;          // TCP port to connect to; typically 587 (TLS) or 465 (SSL)
 
-        // Helpful for troubleshooting TLS certificate issues in some environments.
-        // NOTE: Setting these to false relaxes SSL checks — only use temporarily for diagnostics.
-        $mail->SMTPOptions = [
-            'ssl' => [
-                'verify_peer' => false,
-                'verify_peer_name' => false,
-                'allow_self_signed' => true,
-            ],
-        ];
+        // Production: do not relax TLS verification. Keep strict certificate checks.
+        // If you need to debug TLS issues temporarily, re-enable SMTPOptions locally.
 
         //Recipients
         // 使用传入的 $from 和 $from_name_display
