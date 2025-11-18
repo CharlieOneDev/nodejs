@@ -18,8 +18,26 @@ function loadEnv($path) {
     }
 }
 
-// 加载 .env 文件
+// Enhance .env loading so getenv() can pick up values when running outside composer
+function loadEnvWithPutenv($path) {
+    if (!file_exists($path)) return;
+    $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        if (strpos(trim($line), '#') === 0) continue;
+        if (strpos($line, '=') === false) continue;
+        list($key, $value) = explode('=', $line, 2);
+        $key = trim($key);
+        $value = trim($value);
+        // set in multiple places so different access methods work
+        $_ENV[$key] = $value;
+        $_SERVER[$key] = $value;
+        putenv(sprintf('%s=%s', $key, $value));
+    }
+}
+
+// 加载 .env 文件（支持旧的方式同时确保 getenv() 可见）
 loadEnv(__DIR__ . '/.env');
+loadEnvWithPutenv(__DIR__ . '/.env');
 
 
 // 根据您的安装方式引入 PHPMailer
@@ -34,11 +52,26 @@ require 'PHPMailer_src/SMTP.php';
 error_reporting (E_ALL & ~E_NOTICE & ~E_WARNING & ~E_STRICT & ~E_DEPRECATED);
 
 // ======== SMTP 服务器配置 (新添加) ========
-define("SMTP_HOST", getenv("SMTP_HOST"));     // 您的 SMTP 服务器地址
-define("SMTP_USERNAME", getenv("SMTP_USERNAME"));   // 您的 SMTP 用户名
-define("SMTP_PASSWORD", getenv("SMTP_PASSWORD"));    // 您的 SMTP 密码
-define("SMTP_SECURE", getenv("SMTP_SECURE") === 'ssl' ? PHPMailer::ENCRYPTION_SMTPS : PHPMailer::ENCRYPTION_STARTTLS);  // 加密方式: PHPMailer::ENCRYPTION_STARTTLS (TLS) 或 PHPMailer::ENCRYPTION_SMTPS (SSL)
-define("SMTP_PORT", (int) getenv("SMTP_PORT"));  // SMTP 端口: 587 (TLS) 或 465 (SSL)
+// Read environment variables and validate them. If .env is used locally, loadEnvWithPutenv ensures getenv() sees values.
+$__smtp_host = getenv('SMTP_HOST') ?: null;
+$__smtp_user = getenv('SMTP_USERNAME') ?: getenv('SMTP_USER') ?: null;
+$__smtp_pass = getenv('SMTP_PASSWORD') ?: getenv('SMTP_PASS') ?: null;
+$__smtp_secure_raw = strtolower(getenv('SMTP_SECURE') ?: 'tls'); // default to tls
+// Map common string values to PHPMailer constants
+$__smtp_secure = ($__smtp_secure_raw === 'ssl') ? PHPMailer::ENCRYPTION_SMTPS : PHPMailer::ENCRYPTION_STARTTLS;
+$__smtp_port = (int) (getenv('SMTP_PORT') ?: ($__smtp_secure_raw === 'ssl' ? 465 : 587));
+
+define('SMTP_HOST', $__smtp_host);
+define('SMTP_USERNAME', $__smtp_user);
+define('SMTP_PASSWORD', $__smtp_pass);
+define('SMTP_SECURE', $__smtp_secure);
+define('SMTP_PORT', $__smtp_port);
+
+// Basic validation to help debugging connection issues. Log if required settings appear missing.
+if (empty(SMTP_HOST) || empty(SMTP_USERNAME) || empty(SMTP_PASSWORD) || SMTP_PORT === 0) {
+    error_log(sprintf("SMTP configuration incomplete: host=%s user=%s port=%s secure=%s",
+        SMTP_HOST ?: '[empty]', SMTP_USERNAME ?: '[empty]', SMTP_PORT, $__smtp_secure_raw));
+}
 // ======== END SMTP 服务器配置 ========
 
 //
@@ -395,16 +428,34 @@ function sendMailWithPHPMailer($from, $to, $subject, $body_text, $attachments_da
 
     try {
         //Server settings
-        //$mail->SMTPDebug = SMTP::DEBUG_SERVER; // Enable verbose debug output for testing 测试时打开
-		//$mail->Debugoutput = 'html'; // Debug output format 测试时打开
-        $mail->SMTPDebug = SMTP::DEBUG_OFF;     // Disable debug output for production 上线时打开
+        // Allow controlling SMTP debug level via env `SMTP_DEBUG` (0 = off, 1 = client, 2 = server)
+        $mail->SMTPDebug = (int) (getenv('SMTP_DEBUG') ?: 0);
+        $mail->Debugoutput = 'error_log'; // send debug output to PHP error_log so it appears in Railway logs
+
         $mail->isSMTP();                        // Send using SMTP
+
+        // Basic runtime validation so we fail fast with clear logs if env isn't configured
+        if (empty(SMTP_HOST) || empty(SMTP_USERNAME) || empty(SMTP_PASSWORD) || SMTP_PORT === 0) {
+            error_log("PHPMailer: SMTP settings incomplete, aborting send. Host=" . (SMTP_HOST ?: '[empty]') . " User=" . (SMTP_USERNAME ?: '[empty]') . " Port=" . SMTP_PORT);
+            return false;
+        }
+
         $mail->Host       = SMTP_HOST;          // Set the SMTP server to send through
         $mail->SMTPAuth   = true;               // Enable SMTP authentication
         $mail->Username   = SMTP_USERNAME;      // SMTP username
         $mail->Password   = SMTP_PASSWORD;      // SMTP password
-        $mail->SMTPSecure = SMTP_SECURE;        // Enable implicit TLS encryption
-        $mail->Port       = SMTP_PORT;          // TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
+        $mail->SMTPSecure = SMTP_SECURE;        // Enable TLS/SSL encryption
+        $mail->Port       = SMTP_PORT;          // TCP port to connect to; typically 587 (TLS) or 465 (SSL)
+
+        // Helpful for troubleshooting TLS certificate issues in some environments.
+        // NOTE: Setting these to false relaxes SSL checks — only use temporarily for diagnostics.
+        $mail->SMTPOptions = [
+            'ssl' => [
+                'verify_peer' => false,
+                'verify_peer_name' => false,
+                'allow_self_signed' => true,
+            ],
+        ];
 
         //Recipients
         // 使用传入的 $from 和 $from_name_display
