@@ -57,11 +57,10 @@ a:hover {
 
 /*ヘッダー
 ---------------------------------------------------------------------------*/
-/* --- 修复 Logo 定位問題 (Header) --- */
+/*ヘッダーブロック*/
 header {
 	position: relative;
-	padding: 20px; /* give Header some internal spacing */
-	text-align: center; /* center inline elements such as #logo */
+	padding: 20px;	/*ヘッダー内の余白*/
 }
 /*ヘッダーブロック（トップページへの追加設定）*/
 .home header {
@@ -452,8 +451,7 @@ ul.icon img:hover {
 	padding: 0px 20px;		/*上下、左右へのブロック内の余白*/
 }
 /*日付設定*/
-#menubar ul { margin: 0; padding: 0; box-sizing: border-box; }
-#menubar ul.inner { padding-left: 0; padding-right: 0; }
+#new dt {
 	float: left;
 	width: 9em;		/*幅*/
 	letter-spacing: 0.1em;
@@ -883,93 +881,6 @@ body {
 
 .form-button button:hover {
   background-color: #555;
-}
-
-/* 轮播图容器修复 / main slider (appended) */
-#mainimg {
-		width: 100%;
-		position: relative;
-		overflow: hidden;
-}
-#mainimg img {
-		width: 100%;
-		height: auto;
-		display: block;
-}
-
-/* Home-specific styles */
-/* Global tweaks for home */
-body {
-	font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
-	letter-spacing: 0.05em;
-	color: #444;
-}
-
-.hero-video-section {
-	width: 100%;
-	max-width: 1000px;
-	margin: 80px auto;
-	padding: 0 5%;
-	text-align: center;
-}
-.hero-video-section h2 {
-	font-size: 1.5rem;
-	margin-bottom: 30px;
-	font-weight: normal;
-	color: #333;
-	letter-spacing: 0.2em;
-}
-.video-container {
-	position: relative;
-	padding-bottom: 56.25%;
-	height: 0;
-	overflow: hidden;
-	box-shadow: 0 20px 50px rgba(0,0,0,0.1);
-}
-.video-container iframe { position: absolute; top:0; left:0; width:100%; height:100%; }
-
-/* Home category nav (fixed) */
-.home-category-nav {
-	display: flex;
-	justify-content: center;
-	flex-wrap: wrap;
-	margin: 60px auto;
-	padding: 0 20px;
-	border-bottom: 1px solid #dcdcdc;
-	max-width: 1000px;
-}
-
-.home-cat-card {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	padding: 15px 30px;
-	cursor: pointer;
-	color: #888;
-	text-decoration: none;
-	transition: all 0.3s;
-	border-right: 1px solid #e0e0e0;
-	min-width: 90px;
-}
-.home-cat-card:last-child { border-right: none; }
-.home-cat-card:hover { color: #b4b096; transform: translateY(-3px); }
-
-.home-cat-card h3 {
-	font-size: 12px;
-	margin-top: 10px;
-	font-weight: normal;
-	white-space: nowrap; /* prevent wrapping */
-	line-height: 1;
-}
-
-.cat-icon { width: 28px; height: 28px; stroke: currentColor; fill: none; stroke-width: 1.5; }
-
-@media screen and (max-width: 800px) {
-	.story-block, .story-block.reverse { flex-direction: column; gap: 20px; }
-	.home-category-nav { overflow-x: auto; justify-content: flex-start; border-bottom: none; }
-	.home-cat-card { min-width: 80px; padding: 15px; border-right: 1px solid #eee; }
-	.brand-banner { height: 250px; }
 }
 
 

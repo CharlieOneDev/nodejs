@@ -1,0 +1,113 @@
+/* Small overrides to ensure 7-menu layout and centered header images */
+/* Menubar: remove extra ul padding so 7 * 14.28% fits */
+#menubar ul { margin: 0; padding: 0; box-sizing: border-box; }
+#menubar ul.inner { padding-left: 0 !important; padding-right: 0 !important; }
+
+/* Force 7 items width */
+#menubar ul li { float: left; width: 14.28% !important; font-size: 18px !important; box-sizing: border-box; }
+#menubar ul li a { padding-top: 20px; }
+
+/* Ensure dropdown width doesn't inherit odd paddings */
+#menubar ul.ddmenu { left: 0; width: 100% !important; box-sizing: border-box; }
+
+/* Center and expand header/main images */
+header, header #logo { text-align: center; }
+header #logo { margin: 0 auto; display: block; }
+#mainimg { text-align: center; }
+#mainimg img { display: inline-block; max-width: 100%; height: auto; }
+
+/* Safety: prevent menu items wrapping due to small white-space issues */
+#menubar ul.inner, #menubar ul.inner li { white-space: nowrap; }
+
+/* Make sure homepage category nav no-wrap remains effective */
+.home-category-nav .home-cat-card h3 { white-space: nowrap; }
+
+/* Mobile: allow horizontal scroll for category nav */
+@media screen and (max-width: 800px) {
+    .home-category-nav { overflow-x: auto; }
+    #menubar { display: none; } /* keep existing behavior for small screens */
+}
+
+/* ▼▼▼ 导航栏终极美化：强制七等分 ▼▼▼ */
+
+/* 1. 容器设置：弹性布局，限制最大宽度 */
+#menubar .inner {
+    display: flex !important;           /* 启用弹性布局 */
+    width: 100%;
+    max-width: 1200px;                  /* 限制最大宽度，防止在大屏幕上拉太开 */
+    margin: 0 auto;                     /* 居中 */
+    padding: 0;
+    border-bottom: 1px solid #eee;      /* (可选)加一条淡淡的底线，增加层次感 */
+}
+
+/* 2. 菜单项设置：每个人占一份，宽度完全相等 */
+#menubar .inner li {
+    flex: 1;                            /* 【关键】让7个菜单项平分宽度，不论字数多少 */
+    width: auto !important;             /* 覆盖旧代码 */
+    margin: 0 !important;               /* 去掉左右间距，改用平分 */
+    float: none !important;             /* 清除浮动 */
+    position: relative;                 /* 这里的relative是为了让下拉菜单能定位 */
+    display: flex;                      /* 让内部文字垂直居中 */
+    align-items: center;
+    justify-content: center;
+}
+
+/* 3. 链接样式：填满格子 */
+#menubar .inner li a {
+    display: block;
+    width: 100%;                        /* 让点击区域填满整个格子 */
+    text-align: center;                 /* 文字居中 */
+    padding: 15px 0;                    /* 上下留白，增加高度感 */
+    text-decoration: none;
+    transition: background-color 0.3s;  /* 鼠标放上去的平滑过渡 */
+}
+
+/* 4. 鼠标悬停效果 (可选) */
+#menubar .inner li a:hover {
+    background-color: #f9f9f9;          /* 鼠标移上去有淡淡的背景色 */
+    color: #000;                        /* 文字变黑 */
+}
+
+/* 5. 修复下拉菜单位置 (WORKS下面那个) */
+#menubar .inner li ul.ddmenu {
+    display: none;                      /* 默认隐藏 */
+    position: absolute !important; 
+    top: 100%;                          /* 紧贴在父元素下方 */
+    left: 50% !important;               /* 以父元素中心为基准 */
+    transform: translateX(-50%);        /* 真正居中 */
+    width: 220px;                       /* 下拉菜单的宽度 */
+    text-align: left;                   /* 下拉菜单里的字靠左 */
+    background-color: #fff;             /* 背景白色 */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1); /* 阴影效果 */
+    z-index: 9999;                      /* 保证在最顶层 */
+    padding: 0;
+}
+
+/* 6. 鼠标悬停时显示下拉菜单 */
+#menubar .inner li:hover ul.ddmenu {
+    display: block !important;
+}
+
+/* 7. 下拉菜单里的子选项样式 */
+#menubar .inner li ul.ddmenu li {
+    float: none !important;
+    display: block !important;          /* 强制垂直排列 */
+    width: 100% !important;
+    margin: 0 !important;
+    border-bottom: 1px solid #f0f0f0;   /* 分隔线 */
+    flex: none;                         /* 重要：下拉菜单子项不继承 flex:1 */
+}
+
+#menubar .inner li ul.ddmenu li a {
+    text-align: left;                   /* 文字靠左 */
+    padding: 12px 15px !important;
+    font-size: 13px;                    /* 字体稍小，区分层级 */
+    color: #555;
+    white-space: nowrap;                /* 防止换行 */
+}
+
+#menubar .inner li ul.ddmenu li a:hover {
+    background-color: #f9f9f9;          /* 悬停背景色 */
+    color: #000;
+}
+/* ▲▲▲ 美化结束 ▲▲▲ */

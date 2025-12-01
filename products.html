@@ -1,0 +1,786 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>大恩家具株式会社 - 製品一覧</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="製品一覧">
+<meta name="keywords" content="Daion, 家具, 製品">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/slide.css">
+<link rel="stylesheet" href="css/overrides.css">
+<link rel="icon" href="images/logo-vector-square-color.png" type="image/png">
+<script src="js/openclose.js"></script>
+<script src="js/fixmenu.js"></script>
+<script src="js/fixmenu_pagetop.js"></script>
+<script src="js/ddmenu_min.js"></script>
+<script>
+    // 全局状态
+    let currentMainCat = 'all';
+    let currentSubCat = 'all';
+    
+    // 子分类定义
+    const subCategoryMap = {
+        'sofa': ['2-Seater', 'Couch/L-Shape', 'Module'],
+        'mattress': ['Spring', 'Foam'],
+        'table': ['Dining', 'Coffee'],
+        'chair': ['Dining', 'Office']
+    };
+
+    /* 1. 点击大分类 */
+    function selectMainCategory(cat, element) {
+        currentMainCat = cat;
+        currentSubCat = 'all'; 
+
+        // 样式切换
+        document.querySelectorAll('.cat-card').forEach(el => el.classList.remove('active'));
+        if(element) element.classList.add('active');
+
+        // 生成子分类按钮
+        renderSubCategories(cat);
+        // 执行筛选
+        complexFilter();
+    }
+
+    /* 2. 渲染子分类 */
+    function renderSubCategories(mainCat) {
+        const container = document.getElementById('sub-category-area');
+        const btnContainer = document.getElementById('sub-cat-buttons');
+        btnContainer.innerHTML = ''; 
+
+        if (mainCat === 'all' || !subCategoryMap[mainCat]) {
+            container.style.display = 'none';
+            return;
+        }
+        container.style.display = 'block';
+
+        // "全部"按钮
+        const allBtn = document.createElement('div');
+        allBtn.className = 'sub-cat-btn active';
+        allBtn.innerText = 'All Types';
+        allBtn.onclick = function() { selectSubCategory('all', this); };
+        btnContainer.appendChild(allBtn);
+
+        // 具体子分类按钮
+        subCategoryMap[mainCat].forEach(sub => {
+            const btn = document.createElement('div');
+            btn.className = 'sub-cat-btn';
+            btn.innerText = sub;
+            btn.onclick = function() { selectSubCategory(sub, this); };
+            btnContainer.appendChild(btn);
+        });
+    }
+
+    /* 3. 点击子分类 */
+    function selectSubCategory(sub, element) {
+        currentSubCat = sub;
+        document.querySelectorAll('.sub-cat-btn').forEach(el => el.classList.remove('active'));
+        element.classList.add('active');
+        complexFilter();
+    }
+
+    /* 4. 核心筛选逻辑 (修复版) */
+    function complexFilter() {
+        const keyword = document.getElementById('filter-keyword').value.toLowerCase();
+        const priceRange = document.getElementById('filter-price').value;
+        const checkedColors = Array.from(document.querySelectorAll('input[name="filter-color"]:checked')).map(cb => cb.value);
+
+        const rows = document.querySelectorAll('#product-tbody tr');
+        let visibleCount = 0;
+
+        // Debug: log current category filters and row count
+        console.debug('complexFilter start', { currentMainCat, currentSubCat, rows: rows.length });
+        // Log first few rows' categories for debugging
+        Array.from(rows).slice(0,5).forEach((r,i) => {
+            console.debug(`row[${i}]`, { cat: r.getAttribute('data-category'), sub: r.getAttribute('data-sub-cat') });
+        });
+
+        rows.forEach(row => {
+            let isMatch = true;
+            
+            // 读取属性
+            const rowMainCat = (row.getAttribute('data-category') || '').trim();
+            const rowSubCat = (row.getAttribute('data-sub-cat') || '').trim();
+            const rowPrice = parseInt(row.getAttribute('data-price-min')) || 0;
+            const searchData = row.getAttribute('data-search') || '';
+            const rowColors = row.getAttribute('data-colors') || '';
+
+            // A. 大类筛选
+            if (currentMainCat !== 'all' && rowMainCat !== currentMainCat) isMatch = false;
+
+            // B. 子类筛选
+            if (currentSubCat !== 'all' && rowSubCat !== currentSubCat) isMatch = false;
+
+            // C. 关键词
+            if (keyword && !searchData.includes(keyword)) isMatch = false;
+
+            // D. 价格
+            if (priceRange !== 'all') {
+                if (priceRange === 'under-20000' && rowPrice >= 20000) isMatch = false;
+                if (priceRange === '20000-30000' && (rowPrice < 20000 || rowPrice > 30000)) isMatch = false;
+                if (priceRange === 'over-30000' && rowPrice <= 30000) isMatch = false;
+            }
+
+            // E. 颜色
+            if (checkedColors.length > 0) {
+                const hasColor = checkedColors.some(c => rowColors.includes(c));
+                if (!hasColor) isMatch = false;
+            }
+
+            // 执行显示/隐藏
+            row.style.display = isMatch ? '' : 'none';
+            if(isMatch) visibleCount++;
+        });
+
+        document.getElementById('result-count').innerText = `検索結果: ${visibleCount} 件`;
+        console.debug('complexFilter end', { visibleCount });
+    }
+
+    /* 5. 加载数据 (使用新的 | 分隔符解析) */
+    async function loadProductData() {
+        try {
+            const timestamp = new Date().getTime();
+            const response = await fetch(`products.csv?t=${timestamp}`);
+            if (!response.ok) throw new Error("CSV读取失败");
+            
+            const csvText = await response.text();
+            const products = parseCSV(csvText);
+            
+            const tbody = document.getElementById('product-tbody');
+            tbody.innerHTML = '';
+            
+            products.forEach(product => {
+                const tr = document.createElement('tr');
+                
+                // 设置用于筛选的属性
+                tr.setAttribute('data-category', (product.category || '').trim());
+                tr.setAttribute('data-sub-cat', (product.sub_category || '').trim());
+                tr.setAttribute('data-price-min', product.price_filter || '0');
+                tr.setAttribute('data-colors', (product.colors || '').toLowerCase());
+                tr.setAttribute('data-search', `${product.sku} ${product.product_name} ${product.keywords}`.toLowerCase());
+                
+                // 处理换行符 (现在用 | 分隔)
+                const dimHtml = (product.dimensions_mm || '').replace(/\|/g, '<br>');
+                const matHtml = (product.material_desc || '').replace(/\|/g, '<br>');
+
+                tr.innerHTML = `
+                    <td class="c"><input type="checkbox" name="product" value="${product.sku}"></td>
+                    <td class="c"><img src="${product.image_url}" alt="${product.product_name}" loading="lazy"></td>
+                    <td>
+                        <strong>${product.sku}</strong><br>
+                        <span style="font-size:0.85em; color:#888;">${formatCategory(product.category)}</span>
+                        ${ product.sub_category ? `<br><span style="font-size:0.8em; background:#eee; padding:1px 3px;">${product.sub_category}</span>` : '' }
+                    </td>
+                    <td><strong>${product.product_name}</strong></td>
+                    <td>
+                        <div style="margin-bottom:5px;"><span class="spec-label">[Size]</span><br><span class="spec-text">${dimHtml}</span></div>
+                        <div><span class="spec-label">[Spec]</span><br><span class="spec-text">${matHtml}</span></div>
+                    </td>
+                    <td>
+                        <div><strong>MOQ:</strong> ${product.moq} pcs</div>
+                        <div style="margin-top:3px; font-size:0.85em; color:#666;">納期: ${product.lead_time}</div>
+                    </td>
+                    <td class="c">${product.cbm} m³</td>
+                    <td style="font-weight:bold;">${product.msrp_price}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+            
+            // 初始筛选
+            complexFilter();
+
+        } catch (error) {
+            console.error('Data Load Error:', error);
+        }
+    }
+
+    // CSV解析 (适配新的格式)
+    function parseCSV(text) {
+        const cleanText = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+        const lines = cleanText.split('\n').filter(line => line.trim() !== '');
+        if (lines.length < 2) return [];
+
+        const headers = parseCSVLine(lines[0]);
+        const products = [];
+
+        for (let i = 1; i < lines.length; i++) {
+            const values = parseCSVLine(lines[i]);
+            if (values.length > 0) {
+                const product = {};
+                headers.forEach((header, index) => {
+                    product[header.trim()] = values[index] ? values[index].trim() : '';
+                });
+                products.push(product);
+            }
+        }
+        return products;
+    }
+
+    function parseCSVLine(line) {
+        // 简单的逗号分隔解析，处理双引号
+        const result = [];
+        let current = '';
+        let insideQuotes = false;
+        for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+            if (char === '"') insideQuotes = !insideQuotes;
+            else if (char === ',' && !insideQuotes) { result.push(current); current = ''; }
+            else current += char;
+        }
+        result.push(current);
+        return result.map(v => v.trim().replace(/^"|"$/g, ''));
+    }
+
+    function formatCategory(cat) {
+        const map = { 'mattress': 'マットレス', 'sofa': 'ソファ', 'table': 'テーブル', 'chair': 'チェア' };
+        return map[cat] || cat;
+    }
+
+    // 邮件咨询
+    function sendInquiry() {
+        const checkboxes = document.querySelectorAll('input[name="product"]:checked');
+        if (checkboxes.length === 0) { alert('問い合わせる製品を少なくとも1つ選択してください。'); return; }
+        const selectedProducts = [];
+        checkboxes.forEach((checkbox) => {
+            const row = checkbox.closest('tr');
+            const imgTag = row.cells[1].querySelector('img');
+            const sku = row.cells[2].querySelector('strong').innerText;
+            const name = row.cells[3].innerText;
+            // 获取规格文本，把 <br> 换回空格以便传输
+            const specHtml = row.cells[4].innerHTML;
+            const specText = specHtml.replace(/<br>/g, ' ').replace(/<[^>]+>/g, ' ').trim(); 
+            
+            selectedProducts.push({ image: imgTag ? imgTag.src : '', sku: sku, name: name, spec: specText });
+        });
+        sessionStorage.setItem('inquiryData', JSON.stringify(selectedProducts));
+        window.location.href = 'form.html';
+    }
+
+    // 灯箱
+    document.addEventListener('DOMContentLoaded', function() {
+        loadProductData(); 
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('modalImage');
+        const productTable = document.getElementById('product-list');
+        const closeBtn = document.querySelector('.modal .close');
+        
+        if (productTable) {
+            productTable.addEventListener('click', function(event) {
+                if (event.target.tagName === 'IMG') {
+                    modal.style.display = 'block';
+                    modalImg.src = event.target.src;
+                }
+            });
+        }
+        if (closeBtn) closeBtn.onclick = function() { modal.style.display = 'none'; };
+        window.onclick = function(event) { if (event.target == modal) modal.style.display = 'none'; };
+    });
+</script>
+
+<style>
+    /* 1. 基础表格样式 */
+    #product-list {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    #product-list th, #product-list td {
+        border: 1px solid #ddd;
+        padding: 12px 8px;
+        text-align: left;
+        vertical-align: top;
+    }
+    #product-list th {
+        background-color: #f2f2f2;
+    }
+    #product-list img {
+        max-width: 100px;
+        height: auto;
+        cursor: pointer;
+        transition: opacity 0.3s;
+        border: 1px solid #eee;
+    }
+    #product-list img:hover {
+        opacity: 0.7;
+    }
+
+    /* 2. 规格文字优化 */
+    .spec-text {
+        font-size: 0.9em;
+        line-height: 1.6;
+    }
+    .spec-label {
+        display: inline-block;
+        background-color: #eee;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.85em;
+        margin-bottom: 4px;
+        font-weight: bold;
+        color: #555;
+    }
+
+    /* 3. 按钮容器 */
+    .controls-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    .bottom-buttons-container { text-align: right; margin-top: 20px; }
+    .direct-inquiry-container { text-align: center; margin-top: 30px; }
+    
+    .inquiry-button {
+        background-color: #4CAF50; color: white; padding: 10px 20px; text-align: center;
+        text-decoration: none; display: inline-block; font-size: 16px; cursor: pointer;
+        border: none; border-radius: 5px;
+        transition: background 0.3s;
+    }
+    .inquiry-button:hover { background-color: #45a049; }
+
+    .direct-inquiry-button {
+        background-color: #555; color: white; padding: 12px 25px; text-align: center;
+        text-decoration: none; display: inline-block; font-size: 16px; cursor: pointer;
+        border: none; border-radius: 5px;
+    }
+
+    /* 4. 灯箱 (Image Modal) */
+    .modal {
+        display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%;
+        overflow: auto; background-color: rgba(0,0,0,0.85);
+    }
+    .modal-content {
+        margin: auto; display: block; position: absolute; top: 50%; left: 50%;
+        transform: translate(-50%, -50%); max-width: 90%; max-height: 90vh;
+    }
+    .close {
+        position: absolute; top: 15px; right: 35px; color: #f1f1f1; font-size: 40px; font-weight: bold;
+        transition: 0.3s; cursor: pointer;
+    }
+    .close:hover { color: #bbb; }
+
+    /* ▼▼▼ 新版大品类导航 (极简文字图标版) ▼▼▼ */
+    .category-nav {
+        display: flex;
+        justify-content: center; /* 居中排列 */
+        flex-wrap: wrap; /* 允许换行 */
+        margin-bottom: 30px; /* 稍微减小下方留白 */
+        border-bottom: 1px solid #dcdcdc; /* 整个导航下方的一条细线，增加整体感 */
+        padding-bottom: 8px;
+    }
+
+    /* ▼▼▼ 修正后的分类卡片样式 ▼▼▼ */
+    .cat-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        
+        background: transparent;
+        border: none;
+        border-right: 1px solid #e0e0e0; /* 分隔线颜色变淡一点 */
+        box-shadow: none;
+        border-radius: 0;
+        
+        padding: 10px 25px; /* 调整间距 */
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: #999; /* 默认颜色稍微浅一点 */
+        min-width: 80px; /* 确保最小宽度 */
+    }
+
+    /* 最后一个元素去掉右侧分隔线 */
+    .cat-card:last-child {
+        border-right: none;
+    }
+
+    /* 悬停效果 */
+    .cat-card:hover {
+        color: #b4b096; 
+        transform: translateY(-2px);
+    }
+
+    /* 选中状态 */
+    .cat-card.active {
+        color: #333; 
+        font-weight: bold;
+        position: relative;
+    }
+
+    /* 选中时的底部指示线 */
+    .cat-card.active::after {
+        content: '';
+        display: block;
+        width: 20px; /* 线条短一点更精致 */
+        height: 2px;
+        background-color: #333;
+        position: absolute;
+        bottom: -5px; 
+    }
+
+    /* 文字样式 (修正换行问题) */
+    .cat-card h3 {
+        margin: 8px 0 0 0;
+        font-size: 12px; /* 字体改小 */
+        letter-spacing: 0.05em;
+        font-weight: normal;
+        white-space: nowrap; /* ★关键：强制不换行 */
+        line-height: 1;
+    }
+
+    /* SVG 图标通用样式 */
+    .cat-icon {
+        width: 26px; /* 图标稍微改小，配合小字体 */
+        height: 26px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    /* 移动端适配 */
+    @media screen and (max-width: 600px) {
+        .category-nav {
+            justify-content: flex-start;
+            overflow-x: auto;
+            border-bottom: none;
+        }
+        .cat-card {
+            padding: 8px 12px;
+            min-width: 60px;
+            border-right: 1px solid #eee; /* 手机上边框淡一点 */
+        }
+        .cat-card h3 {
+            font-size: 11px;
+        }
+        .cat-icon { width: 18px; height: 18px; }
+    }
+
+    /* ▼▼▼ 6. 新增：子分类标签栏样式 ▼▼▼ */
+    .sub-cat-container {
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eee;
+        display: none; /* 默认隐藏 */
+    }
+
+    .sub-cat-title {
+        font-size: 14px;
+        font-weight: bold;
+        color: #555;
+        margin-bottom: 10px;
+    }
+
+    .sub-cat-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .sub-cat-btn {
+        padding: 6px 15px;
+        border-radius: 20px;
+        border: 1px solid #ccc;
+        background: #fff;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .sub-cat-btn:hover { background: #f0f0f0; }
+
+    .sub-cat-btn.active {
+        background: #b4b096; /* 选中变金棕色 */
+        color: white;
+        border-color: #b4b096;
+    }
+
+    /* 7. 筛选面板样式 */
+    .filter-dashboard {
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        padding: 20px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        align-items: flex-start;
+    }
+    .filter-group { flex: 1; min-width: 200px; }
+    .filter-group h4 {
+        font-size: 16px; margin-bottom: 10px; border-bottom: 1px dashed #ccc; padding-bottom: 5px; color: #555;
+    }
+    .filter-group input[type="text"], .filter-group select {
+        width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;
+    }
+    .filter-group label { display: block; margin-bottom: 5px; cursor: pointer; font-size: 14px; }
+    .hidden-cat-filter { display: none; } /* 隐藏旧的分类复选框 */
+</style>
+</head>
+
+<body>
+
+<div id="container">
+
+<header>
+<h1 id="logo"><a href="index.html"><img src="images/logo-color.png" alt="PRODUCTION"></a></h1>
+</header>
+
+<!--PC用（801px以上端末）メニュー-->
+<nav id="menubar" class="nav-fix-pos">
+<ul class="inner">
+<li><a href="index.html">HOME<span>ホーム</span></a></li>
+<li><a href="about.html">ABOUT<span>当社について</span></a></li>
+<li><a href="products.html">PRODUCTS<span>製品一覧</span></a></li>
+<li><a href="javascript:void(0)" class="cursor-default">WORKS<span>業務内容</span></a>
+    <ul class="ddmenu">
+    <li><a href="business_corporate.html">法人向け事業</a></li>
+    <li><a href="business_ec.html">ECソリューション事業</a></li>
+    <li><a href="business_promotion.html">プロモーション支援事業</a></li>
+    </ul>
+</li>
+<li><a href="guide.html">GUIDE<span>ご利用案内</span></a></li>
+<li><a href="recruit.html">RECRUIT<span>採用情報</span></a></li>
+<li><a href="form.html">CONTACT<span>お問い合わせ</span></a></li>
+</ul>
+</nav>
+
+<!--小さな端末用（800px以下端末）メニュー-->
+<nav id="menubar-s">
+<ul>
+<li><a href="index.html">HOME<span>ホーム</span></a></li>
+<li><a href="about.html">ABOUT<span>当社について</span></a></li>
+<li><a href="products.html">PRODUCTS<span>製品一覧</span></a></li>
+<li id="menubar_hdr2" class="close">WORKS<span>業務内容</span>
+    <ul id="menubar-s2">
+    <li><a href="business_corporate.html">法人向け事業</a></li>
+    <li><a href="business_ec.html">ECソリューション事業</a></li>
+    <li><a href="business_promotion.html">プロモーション支援事業</a></li>
+    </ul>
+</li>
+<li><a href="guide.html">GUIDE<span>ご利用案内</span></a></li>
+<li><a href="recruit.html">RECRUIT<span>採用情報</span></a></li>
+<li><a href="form.html">CONTACT<span>お問い合わせ</span></a></li>
+</ul>
+</nav>
+
+<div id="contents">
+<div class="inner">
+<section>
+    <h2>製品一覧(オーダーメイド対応)</h2>
+
+    <!-- ▼▼▼ 1. 大品类导航区 (Main Category) ▼▼▼ -->
+    <div class="category-nav">
+        <!-- すべて (全部) -->
+        <div class="cat-card active" onclick="selectMainCategory('all', this)">
+            <svg class="cat-icon" viewBox="0 0 24 24">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+            <h3>すべて</h3>
+        </div>
+
+        <!-- ソファ (沙发) -->
+        <div class="cat-card" onclick="selectMainCategory('sofa', this)">
+            <svg class="cat-icon" viewBox="0 0 24 24">
+                <path d="M20 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v3"></path>
+                <path d="M2 11v5a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5a2 2 0 0 0-4 0v2H6v-2a2 2 0 0 0-4 0z"></path>
+            </svg>
+            <h3>ソファ</h3>
+        </div>
+
+        <!-- マットレス (床垫 - 新图标) -->
+        <div class="cat-card" onclick="selectMainCategory('mattress', this)">
+            <svg class="cat-icon" viewBox="0 0 24 24">
+                <!-- 床垫主体：圆角矩形 -->
+                <rect x="2" y="8" width="20" height="10" rx="2"></rect> 
+                <!-- 侧面纹理线条，表现厚度 -->
+                <path d="M2 13h20"></path> 
+                <!-- 表面一点点纹理 -->
+                <path d="M6 8v5 M10 8v5 M14 8v5 M18 8v5" stroke-opacity="0.3"></path>
+            </svg>
+            <h3>マットレス</h3>
+        </div>
+
+        <!-- テーブル (桌子) -->
+        <div class="cat-card" onclick="selectMainCategory('table', this)">
+            <svg class="cat-icon" viewBox="0 0 24 24">
+                <path d="M4 11v9"></path>
+                <path d="M20 11v9"></path>
+                <path d="M2 11h20"></path>
+                <path d="M4 11V7a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v4"></path>
+            </svg>
+            <h3>テーブル</h3>
+        </div>
+
+        <!-- チェア (椅子) -->
+        <div class="cat-card" onclick="selectMainCategory('chair', this)">
+            <svg class="cat-icon" viewBox="0 0 24 24">
+                <path d="M7 13V6a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v7"></path>
+                <path d="M4 13h16a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-2a1 1 0 0 1 1-1z"></path>
+                <path d="M7 17v5"></path>
+                <path d="M17 17v5"></path>
+            </svg>
+            <h3>チェア</h3>
+        </div>
+    </div>
+
+    <!-- ▼▼▼ 2. 动态子分类区 (Sub Category) ▼▼▼ -->
+    <div id="sub-category-area" class="sub-cat-container">
+        <div class="sub-cat-title">絞り込み (Sub Category):</div>
+        <div class="sub-cat-tabs" id="sub-cat-buttons">
+            <!-- JS 会自动在这里生成按钮，比如 "2-Seater", "Couch" -->
+        </div>
+    </div>
+
+    <!-- ▼▼▼ 3. 筛选面板 (保留价格和颜色，隐藏分类) ▼▼▼ -->
+    <div class="filter-dashboard">
+        <!-- 隐藏原有的分类筛选，因为我们用大卡片代替了 -->
+        <div class="filter-group hidden-cat-filter">
+            <input type="checkbox" name="filter-cat" value="sofa" checked>
+            <input type="checkbox" name="filter-cat" value="mattress" checked>
+            <input type="checkbox" name="filter-cat" value="table" checked>
+            <input type="checkbox" name="filter-cat" value="chair" checked>
+        </div>
+
+        <!-- 搜索框 -->
+        <div class="filter-group">
+            <h4>キーワード検索</h4>
+            <input type="text" id="filter-keyword" placeholder="品番・仕様・材質..." onkeyup="complexFilter()">
+        </div>
+
+        <!-- 价格 -->
+        <div class="filter-group">
+            <h4>予算 (税抜)</h4>
+            <select id="filter-price" onchange="complexFilter()">
+                <option value="all">指定なし</option>
+                <option value="under-20000">¥20,000 以下</option>
+                <option value="20000-30000">¥20,000 - ¥30,000</option>
+                <option value="over-30000">¥30,000 以上</option>
+            </select>
+        </div>
+
+        <!-- 颜色 -->
+        <div class="filter-group">
+            <h4>カラー</h4>
+            <label><input type="checkbox" name="filter-color" value="gray" onchange="complexFilter()"> グレー系</label>
+            <label><input type="checkbox" name="filter-color" value="black" onchange="complexFilter()"> ブラック系</label>
+            <label><input type="checkbox" name="filter-color" value="white" onchange="complexFilter()"> ホワイト系</label>
+            <label><input type="checkbox" name="filter-color" value="green" onchange="complexFilter()"> グリーン系</label>
+        </div>
+    </div>
+
+    <!-- 这是一个显示筛选结果数量的小提示 -->
+    <p id="result-count" style="margin-bottom: 10px; font-weight:bold; color:#666;">全件表示中</p>
+
+    <!-- 原有的按钮 -->
+    <div class="controls-container" style="justify-content: flex-end;">
+        <button class="inquiry-button" onclick="sendInquiry()">選択した製品をメールで問い合わせる</button>
+    </div>
+
+    <table id="product-list">
+        <thead>
+            <tr>
+                <th width="4%">選択</th>
+                <th width="8%">画像</th>
+                <th width="10%">品番/カテゴリ</th>
+                <th width="15%">製品名</th>
+                <th width="25%">仕様 (サイズ / 材質)</th>
+                <th width="12%">取引条件 (MOQ/納期)</th>
+                <th width="6%">CBM</th>
+                <th width="10%">参考価格 (税抜)</th>
+            </tr>
+        </thead>
+        <tbody id="product-tbody">
+        </tbody>
+    </table>
+    
+    <div class="bottom-buttons-container">
+        <button class="inquiry-button" onclick="sendInquiry()">選択した製品をメールで問い合わせる</button>
+    </div>
+
+    <div class="direct-inquiry-container">
+        <a href="form.html" class="direct-inquiry-button">お探しの商品が見つからない場合は、こちらから直接お問い合わせください</a>
+    </div>
+
+</section>
+</div>
+</div>
+
+<footer>
+    <!-- ... 页脚部分保持不变 ... -->
+    <div class="footer-container">
+        <div id="footermenu" class="inner">
+            <ul>
+                <li class="title">会社情報</li>
+                <li><a href="about.html">Daionについて</a></li> 
+                <li><a href="recruit.html">採用情報</a></li>
+                <li><a href="privacy.html">プライバシーポリシー</a></li>
+                <li><a href="tokushoho.html">特定商取引法に基づく表記</a></li>
+            </ul>
+            <ul>
+                <li class="title">サービス</li>
+                <li><a href="business_corporate.html">法人向け事業</a></li>
+                <li><a href="business_ec.html">ECソリューション事業</a></li>
+				<li><a href="business_promotion.html">プロモーション支援事業</a></li>
+            </ul>
+			 <ul>
+                <li class="title">お問い合わせ</li>
+                <li><a href="form.html">カスタマーセンター</a></li> 
+            </ul>
+            <ul>
+                <li>
+                    <strong>本店</strong><br>
+                    〒831-0004<br> 
+                    福岡県大川市大字一木１０５０番地４<br>
+                </li>
+            </ul>
+        </div><div id="footer-social"> 
+            <div class="social-media-section">
+                <h3 class="title">OFFICIAL SNS</h3>
+                <ul class="icon">
+                    <li><a href="https://www.facebook.com/profile.php?id=61576734628932&locale=ja_JP" aria-label="Facebook"><img src="images/icon_facebook.png" alt="Facebook"></a></li>
+                    <li><a href="https://www.instagram.com/daionjp/" aria-label="Instagram"><img src="images/icon_instagram.png" alt="Instagram"></a></li>
+                    <li><a href="https://x.com/DaionJP" aria-label="X (formerly Twitter)"><img src="images/icon_X.png" alt="X"></a></li>
+					          <li><a href="https://www.youtube.com/channel/UCxArMxSR2ZXjwkCNMaDQzcg" aria-label="YouTube"><img src="images/icon_youtube.png" alt="YouTube"></a></li>
+                </ul>
+            </div>
+        </div></div><div id="copyright">
+        <p class="slogan">次元を越えて、あなたの暮らしへ</p> 
+        <small>Copyright&copy; <a href="/">大恩家具株式会社</a> All Rights Reserved.</small>
+    </div>
+</footer>
+
+</div>
+<!--/#container-->
+
+<!-- ▼▼▼ 灯箱/大图预览 HTML 结构 ▼▼▼ -->
+<div id="imageModal" class="modal">
+  <span class="close">&times;</span>
+  <img class="modal-content" id="modalImage">
+</div>
+<!-- ▲▲▲ HTML 结构结束 ▲▲▲ -->
+
+
+<p class="nav-fix-pos-pagetop"><a href="#">↑</a></p>
+
+<!--メニュー開閉ボタン-->
+<div id="menubar_hdr" class="close"></div>
+
+<!--メニューの開閉処理-->
+<script>
+open_close("menubar_hdr", "menubar-s");
+</script>
+
+<!--「WORKS」の子メニュー-->
+<script>
+    open_close("menubar_hdr2", "menubar-s2");
+</script>
+
+</body>
+</html>

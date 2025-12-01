@@ -1,0 +1,8 @@
+﻿sku,sub_category,category,product_name,image_url,dimensions_mm,material_desc,moq,lead_time,cbm,msrp_price,price_filter,colors,keywords
+DK-M001,Spring,mattress,高密度ポケットコイルマットレス,images/production/mattress/DKM001WH2.jpg,"S: W970 x L1950 x H220|SD: W1200 x L1950 x H220|D: W1400 x L1950 x H220","構造: ポケットコイル（並行配列）|生地: プレミアムニット（防炎仕様）",10,30-45日,0.35,"22,000 - 38,000",22000,white,mattress spring hotel
+DK-S1867,Couch/L-Shape,sofa,モダンカウチソファセット,images/production/sofa/1867GY.jpg,"W2100 x D850 x H780|(SH420 mm)","脚部: スチール（黒粉体塗装）|張地: ポリエステル（フルカバーリング）",5,45-60日,0.85,"15,000 - 19,000",15000,gray black white,sofa couch modern
+DK-S2102,Module,sofa,モジュールソファシステム,images/production/sofa/2102GR.jpg,"1ユニット: W900 x D900 x H700|(レイアウト自由)","フレーム: 天然木（パイン材）|中材: 高密度ウレタンフォーム",5,45日,0.40,"15,000 - 19,000",15000,green orange,sofa module
+DK-S2130,2-Seater,sofa,コンパクト2Pソファ,images/production/sofa/2130GY.jpg,"W1400 x D750 x H700|(SH400 mm)","スタイル: 北欧モダン|木部: ラバーウッド無垂（ナチュラル）",1,在庫あり(即納),0.45,"13,000 - 17,000",13000,gray beige,sofa 2person
+DK-S2264,2-Seater,sofa,スタンダード2Pソファ,images/production/sofa/2264GY.jpg,"W1600 x D800 x H750|(SH410 mm)","デザイン: シンプルモダン|アーム: スリムタイプ設計",3,在庫あり(即納),0.50,"13,000 - 17,000",13000,gray darkgray black,sofa 2person
+DK-S2265,2-Seater,sofa,ラグジュアリー2Pソファ,images/production/sofa/2265GY.jpg,"W1650 x D820 x H760|(SH420 mm)","座面: フェザー + ウレタン積層|脚部: オーク無垢材",3,45日,0.55,"13,000 - 17,000",13000,gray darkgray black,sofa 2person
+DK-S2264-L,Module,sofa,ロータイプモジュールソファ,images/production/sofa/2264GY.jpg,"W1800 x D900 x H600|(SH350 mm)","タイプ: フロア/ロースタイル|和室タタミ対応傷防止フェルト付",5,60日,0.60,"21,000 - 27,000",21000,gray darkgray black,sofa module lowtype

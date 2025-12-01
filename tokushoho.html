@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
@@ -7,6 +7,8 @@
 <meta name="description" content="大恩家具株式会社の特定商取引法に基づく表記です。">
 <meta name="keywords" content="特定商取引法, 特商法, NEMON, Daion, 大恩家具">
 <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/slide.css">
+<link rel="stylesheet" href="css/overrides.css">
 <link rel="icon" href="images/logo-vector-square-color.png" type="image/png">
 <script src="js/openclose.js"></script>
 <script src="js/fixmenu.js"></script>
@@ -14,36 +16,81 @@
 <script src="js/ddmenu_min.js"></script>
 <!-- 追加スタイル -->
 <style>
+    /* 容器布局：增加间距，居中 */
     .brand-actions-container {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 15px;
-        margin-top: 25px;
-        margin-bottom: 30px;
+        gap: 20px;
+        margin: 30px auto 50px;
+        padding: 30px;
+        background-color: #fafafa; /* 淡淡的背景色，突出区域 */
+        border-radius: 8px;
+        max-width: 600px;
     }
-    .amazon-store-button {
-        display: inline-block;
-        padding: 12px 25px;
-        background-color: #2d2d2d;
-        color: #ffffff;
-        font-weight: bold;
-        text-align: center;
-        text-decoration: none;
-        border-radius: 5px;
-        border: none;
-        cursor: pointer;
-        transition: opacity 0.3s ease;
-    }
-    .amazon-store-button:hover {
-        opacity: 0.8;
-    }
-    .brand-logo-link {
-        display: inline-block;
-    }
+
+    /* 品牌Logo */
     .brand-logo {
-        max-width: 240px;
+        max-width: 200px;
         height: auto;
+        margin-bottom: 10px;
+    }
+
+    /* 按钮组容器 */
+    .button-group {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 100%;
+    }
+
+    /* 通用按钮样式 */
+    .action-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 14px 30px;
+        font-weight: bold;
+        text-decoration: none;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+        min-width: 220px;
+        font-size: 15px;
+    }
+
+    /* 1. 独立站购买按钮 (主要颜色) */
+    .btn-store {
+        background-color: #aa9b77; /* 配合你网站的金色/卡其色调 */
+        color: #ffffff;
+        border: 1px solid #aa9b77;
+    }
+    .btn-store:hover {
+        background-color: #8e8060;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(170, 155, 119, 0.3);
+    }
+
+    /* 2. 邮件咨询按钮 (次要颜色) */
+    .btn-contact {
+        background-color: #ffffff;
+        color: #444;
+        border: 1px solid #ccc;
+    }
+    .btn-contact:hover {
+        background-color: #f0f0f0;
+        border-color: #999;
+        transform: translateY(-2px);
+    }
+    
+    /* 手机适配 */
+    @media screen and (max-width: 600px) {
+        .button-group {
+            flex-direction: column;
+        }
+        .action-btn {
+            width: 100%;
+        }
     }
 </style>
 </head>
@@ -60,14 +107,15 @@
 <ul class="inner">
 <li><a href="index.html">HOME<span>ホーム</span></a></li>
 <li><a href="about.html">ABOUT<span>当社について</span></a></li>
-<li><a href="production.html">PRODUCTION<span>製品一覧</span></a></li>
+<li><a href="products.html">PRODUCTS<span>製品一覧</span></a></li>
 <li><a href="javascript:void(0)" class="cursor-default">WORKS<span>業務内容</span></a>
-	<ul class="ddmenu">
-	<li><a href="business_corporate.html">法人向け事業</a></li>
-	<li><a href="business_ec.html">ECソリューション事業</a></li>
-	<li><a href="business_promotion.html">プロモーション支援事業</a></li>
-	</ul>
+    <ul class="ddmenu">
+    <li><a href="business_corporate.html">法人向け事業</a></li>
+    <li><a href="business_ec.html">ECソリューション事業</a></li>
+    <li><a href="business_promotion.html">プロモーション支援事業</a></li>
+    </ul>
 </li>
+<li><a href="guide.html">GUIDE<span>ご利用案内</span></a></li>
 <li><a href="recruit.html">RECRUIT<span>採用情報</span></a></li>
 <li><a href="form.html">CONTACT<span>お問い合わせ</span></a></li>
 </ul>
@@ -78,14 +126,15 @@
 <ul>
 <li><a href="index.html">HOME<span>ホーム</span></a></li>
 <li><a href="about.html">ABOUT<span>当社について</span></a></li>
-<li><a href="production.html">PRODUCTION<span>製品一覧</span></a></li>
+<li><a href="products.html">PRODUCTS<span>製品一覧</span></a></li>
 <li id="menubar_hdr2" class="close">WORKS<span>業務内容</span>
-	<ul id="menubar-s2">
-	<li><a href="business_corporate.html">法人向け事業</a></li>
-	<li><a href="business_ec.html">ECソリューション事業</a></li>
-	<li><a href="business_promotion.html">プロモーション支援事業</a></li>
-	</ul>
+    <ul id="menubar-s2">
+    <li><a href="business_corporate.html">法人向け事業</a></li>
+    <li><a href="business_ec.html">ECソリューション事業</a></li>
+    <li><a href="business_promotion.html">プロモーション支援事業</a></li>
+    </ul>
 </li>
+<li><a href="guide.html">GUIDE<span>ご利用案内</span></a></li>
 <li><a href="recruit.html">RECRUIT<span>採用情報</span></a></li>
 <li><a href="form.html">CONTACT<span>お問い合わせ</span></a></li>
 </ul>
@@ -96,57 +145,81 @@
 <h2>特定商取引法に基づく表記<span>ACT ON SPECIFIED COMMERCIAL TRANSACTIONS</span></h2>
 
 <section>
-    <!-- ここに更新された説明文を配置 -->
-    <p>「NEMON」は、当社が展開する公式ブランドです。ブランド公式サイト（www.nemon.co.jp ※現在準備中）に先駆け、商品はAmazon公式ストアにてお買い求めいただけます。そのため、販売に関するすべての条件はAmazonの規定に準じます。</p>
     
-    <!-- ロゴとAmazonボタンを垂直に配置するためのコンテナ -->
+    <!-- 引导区域：清晰分流 -->
     <div class="brand-actions-container">
-        <!-- ロゴ（クリックで公式サイトへ） -->
-        <a href="https://www.nemon.co.jp" class="brand-logo-link" target="_blank" rel="noopener noreferrer">
-            <img src="images/nemon-logo.png" alt="NEMON ブランドロゴ" class="brand-logo">
+        <a href="https://www.nemon.co.jp" target="_blank" class="brand-logo-link">
+            <img src="images/logo-color.png" alt="NEMON" class="brand-logo">
         </a>
-        <!-- Amazonストアボタン -->
-        <a href="https://www.amazon.com/shops/NEMON" class="amazon-store-button" target="_blank" rel="noopener noreferrer">
-            Amazonストアで商品を見る
-        </a>
+        
+        <p style="text-align:center; line-height:1.8; font-size:0.95rem;">
+            大恩家具の公式ブランド「NEMON」の商品は、<br>
+            公式オンラインストアにてご購入いただけます。<br>
+            <span style="font-size:0.85rem; color:#666;">※法人様・大口注文・特注家具のご相談は「お問い合わせ」より承ります。</span>
+        </p>
+
+        <div class="button-group">
+            <!-- 引导去独立站 -->
+            <a href="https://www.nemon.co.jp" class="action-btn btn-store" target="_blank">
+                NEMON 公式ストアで購入 
+            </a>
+            <!-- 引导去邮件咨询 -->
+            <a href="form.html" class="action-btn btn-contact">
+                お見積り・お問い合わせ
+            </a>
+        </div>
     </div>
+
+    <!-- 法律条款（去亚马逊化，改为通用或以独立站为准） -->
 
     <h3>販売事業者名</h3>
     <p>大恩家具株式会社</p>
     
-    <h3>屋号またはサービス名</h3>
-    <p>NEMON</p>
-
     <h3>運営統括責任者名</h3>
-    <p>Charlie Wong</p>
+    <p>黄 義恩</p>
 
     <h3>所在地</h3>
     <p>〒831-0004 福岡県大川市大字一木１０５０番地４</p>
     
     <h3>電話番号</h3>
-    <p>0944-78-9513</p>
+    <p>0944-78-9513<br><span style="font-size:12px; color:#888;">※お電話でのお問い合わせは受け付けておりません。メールまたはフォームよりご連絡ください。</span></p>
 
     <h3>メールアドレス</h3>
     <p>customer@daion.co.jp</p>
 
     <h3>販売価格</h3>
-    <p>Amazonの各商品販売ページに表示された価格（消費税込み）に準じます。</p>
+    <p>各商品ページに表示された価格（消費税込み）に基づきます。</p>
     
     <h3>商品代金以外の必要料金</h3>
-    <p>送料、手数料等はAmazonの規定に準じます。詳細は商品購入手続きの際に画面にてご確認ください。</p>
+    <p>
+        ・配送料（配送先・商品サイズにより異なります）<br>
+        ・銀行振込手数料（銀行振込の場合）
+    </p>
 
     <h3>お支払い方法</h3>
-    <p>Amazonでご利用いただけるお支払い方法（クレジットカード、Amazonギフト券など）に準じます。</p>
+    <p>
+        <strong>【公式サイト（NEMON）でのご購入】</strong><br>
+        クレジットカード、各種オンライン決済をご利用いただけます。<br><br>
+        <strong>【直接取引（メール・見積書ベース）】</strong><br>
+        銀行振込（前払い）
+    </p>
     
     <h3>支払時期</h3>
-    <p>Amazonの規定に準じます。ご利用のお支払い方法により異なります。</p>
+    <p>
+        ・クレジットカード：ご利用のカード会社の締め日・支払日に準じます。<br>
+        ・銀行振込：請求書発行後、指定の期日までにお振込みください。
+    </p>
 
     <h3>商品の引渡し時期</h3>
-    <p>ご注文後、Amazonの配送ポリシーに基づき発送されます。詳細は商品購入ページに表示されるお届け予定日をご確認ください。</p>
+    <p>
+        在庫がある場合、決済確認後3営業日以内に発送いたします。<br>
+        受注生産品・特注品については、別途メールにて納期をご案内いたします。
+    </p>
     
     <h3>返品・交換について</h3>
     <p>
-      商品の返品・交換に関する条件および手続きは、すべてAmazonの返品・交換ポリシーに準じます。詳細はAmazonのウェブサイトにてご確認ください。
+        商品到着後7日以内にご連絡いただいた場合、初期不良・発送間違いに限り交換・返品を承ります。<br>
+        お客様都合（イメージ違い・サイズ間違い等）による返品はお受けできませんので予めご了承ください。<br>
     </p>
 
 </section>

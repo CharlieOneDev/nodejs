@@ -9,7 +9,6 @@
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/slide.css">
 <link rel="stylesheet" href="css/overrides.css">
-<link rel="stylesheet" href="css/index-layout.css">
 <link rel="icon" href="images/logo-vector-square-color.png" type="image/png">
 <script src="js/openclose.js"></script>
 <script src="js/fixmenu.js"></script>
@@ -125,21 +124,20 @@
     </section>
 
     <!-- Brand banner -->
-    <section class="home-section-width">
-        <a href="https://www.nemon.co.jp" target="_blank" class="nemon-card">
-            <img src="images/5.jpg" alt="NEMON Brand">
-            <div class="nemon-text-box">
-                <p class="nemon-subtitle">Official EC Brand</p>
-                <h2 class="nemon-title">NEMON</h2>
-                <p class="nemon-cta">公式オンラインストアへ →</p>
+    <a href="https://www.nemon.co.jp" target="_blank" style="text-decoration:none;">
+        <section class="brand-banner">
+            <img src="images/5.jpg" alt="NEMON">
+            <div class="brand-overlay">
+                <h2>NEMON</h2>
+                <p>Official EC Brand</p>
             </div>
-        </a>
-    </section>
+        </section>
+    </a>
 
     <!-- News -->
     <section id="new">
-        <h2>News</h2>
-        <dl id="news-list">
+        <h2 style="text-align:center; font-size:1.8rem; margin-bottom:40px;">News</h2>
+        <dl id="news-list" style="max-width:800px; margin:0 auto;">
             <dt>2025/11/15</dt>
             <dd><a href="images/DaionBook.pdf" target="_blank">最新商品カタログのご案内</a> <span class="newicon">NEW</span></dd>
             <dt>2025/05/25</dt>
@@ -147,7 +145,7 @@
             <dt class="old-news" style="display: none;">2023/12/15</dt>
             <dd class="old-news" style="display: none;">大恩家具株式会社の商号に変更</dd>
         </dl>
-        <p class="r"><a href="javascript:void(0);" id="toggle-news" onclick="toggleNews()">▶︎&nbsp;過去ログ</a></p>
+        <p class="r" style="max-width:800px; margin:20px auto 0;"><a href="javascript:void(0);" id="toggle-news" onclick="toggleNews()">▶︎&nbsp;過去ログ</a></p>
     </section>
 
 </div> <!-- /#contents -->

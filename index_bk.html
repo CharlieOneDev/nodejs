@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
@@ -14,9 +14,34 @@
 <script src="js/fixmenu.js"></script>
 <script src="js/fixmenu_pagetop.js"></script>
 <script src="js/ddmenu_min.js"></script>
+<!-- ▼YouTube動画をレスポンシブ対応にするためのCSSを追加 -->
+<style>
+/* ↓ サイズと配置を指定する外枠のスタイル */
+.video-wrapper {
+    max-width: 50%; /* 幅を半分に */
+    margin: 0 auto 20px auto; /* 上下左右の余白と中央揃え */
+}
+
+/* ↓ アスペクト比を維持する内枠のスタイル */
+.video-container {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9のアスペクト比 */
+    height: 0;
+    overflow: hidden;
+}
+
+.video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+</style>
+<!-- ▲ここまで追加 -->
 </head>
 
-<body class="home">
+<body>
 
 <div id="container">
 
@@ -35,7 +60,7 @@
 <ul class="inner">
 <li><a href="index.html">HOME<span>ホーム</span></a></li>
 <li><a href="about.html">ABOUT<span>当社について</span></a></li>
-<li><a href="production.html">PRODUCTION<span>製品一覧</span></a></li>
+<li><a href="products.html">PRODUCTS<span>製品一覧</span></a></li>
 <li><a href="javascript:void(0)" class="cursor-default">WORKS<span>業務内容</span></a>
 	<ul class="ddmenu">
 	<li><a href="business_corporate.html">法人向け事業</a></li>
@@ -43,6 +68,9 @@
 	<li><a href="business_promotion.html">プロモーション支援事業</a></li>
 	</ul>
 </li>
+<!-- ▼ 新增 GUIDE ▼ -->
+<li><a href="guide.html">GUIDE<span>ご利用案内</span></a></li>
+<!-- ▲ 新增结束 ▲ -->
 <li><a href="recruit.html">RECRUIT<span>採用情報</span></a></li>
 <li><a href="form.html">CONTACT<span>お問い合わせ</span></a></li>
 </ul>
@@ -53,7 +81,7 @@
 <ul>
 <li><a href="index.html">HOME<span>ホーム</span></a></li>
 <li><a href="about.html">ABOUT<span>当社について</span></a></li>
-<li><a href="production.html">PRODUCTION<span>製品一覧</span></a></li>
+<li><a href="products.html">PRODUCTS<span>製品一覧</span></a></li>
 <li id="menubar_hdr2" class="close">WORKS<span>業務内容</span>
 	<ul id="menubar-s2">
 	<li><a href="business_corporate.html">法人向け事業</a></li>
@@ -69,6 +97,18 @@
 <div id="contents">
 
 <div class="inner">
+
+<!-- ▼ここからYouTube動画のセクションを追加 -->
+<section>
+    <h2>BRAND MOVIE<span>大恩家具ブランドムービー</span></h2>
+    <!-- ↓ サイズと配置を指定する外枠を追加 -->
+    <div class="video-wrapper">
+        <div class="video-container">
+            <iframe src="https://www.youtube.com/embed/mV5wdTmGHWI" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+    </div>
+</section>
+<!-- ▲ここまで追加 -->
 
 <section>
 
@@ -121,12 +161,17 @@
 </section>
 
 <section id="new">
-<h2>News<span>お知らせ</span></h2>
-<dl id="news-list">
-<dt>2025/05/25</dt>
+  <h2>News<span>お知らせ</span></h2>
+  <dl id="news-list">
+  <dt>2025/11/15</dt>  
+  <dd>
+    <a href="images/DaionBook.pdf" target="_blank">最新商品カタログのご案内</a>
+    <span class="newicon">NEW</span>
+  </dd>
+
+  <dt>2025/05/25</dt>
   <dd>
     <a href="https://www.nemon.co.jp" target="_blank">大恩家具のブランド「NEMON」を発表しました。 </a>
-    <span class="newicon">NEW</span>
   </dd>
   <dt>2025/05/25</dt>
   <dd>公式SNSアカウントは公開されます。</dd>
@@ -212,7 +257,10 @@ function toggleNews() {
             </ul>
             <ul>
                 <li>
-                    <strong>本店</strong><br>
+                <!-- ▼ 新增 GUIDE ▼ -->
+                <li><a href="guide.html">GUIDE<span>ご利用案内</span></a></li>
+                <!-- ▲ 新增结束 ▲ -->
+                <li><a href="recruit.html">RECRUIT<span>採用情報</span></a></li>
                     〒831-0004<br> 
                     福岡県大川市大字一木１０５０番地４<br>
                 </li>
