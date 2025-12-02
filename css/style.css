@@ -109,7 +109,7 @@ header #logo {
 	letter-spacing: 0.2em;	/*文字間隔を少し広くとる設定*/
 }
 /*スマホ用メニューを表示させない*/
-#menubar-s, #menubar-s2 {display: none;}
+#menubar-s, #menubar-s2, #menubar-s-prod {display: none;}
 
 /*３本バーアイコンを表示させない*/
 #menubar_hdr {display: none;}
@@ -638,7 +638,7 @@ header {
 	font-size: 80%;
 }
 /*メニュー１個あたりの設定と、子メニューの見出し。*/
-#menubar-s ul li a,#menubar_hdr2 {
+#menubar-s ul li a, #menubar_hdr_prod, #menubar_hdr2 {
 	display: block;text-decoration: none;
 	padding: 30px 20px 30px 60px;
 	border-bottom: 1px solid #fff;	/*下の線の幅、線種、色*/
@@ -650,31 +650,39 @@ header {
 /*子メニュー
 ---------------------------------------------------------------------------*/
 /*子メニューの見出しの追加。基本は上のブロックで設定しています。*/
-#menubar_hdr2 {
+#menubar_hdr_prod, #menubar_hdr2 {
 	padding-left: 60px;	/*上にある「メニュー１個あたりの設定と、子メニューの見出し」の最後の数字（４つ目）に合わせる。*/
 }
 /*子メニューメニューブロック全体*/
-#menubar-s2 {
+#menubar-s2, #menubar-s-prod {
 	display: block;
 	margin-top: 10px;
 	border-radius: 5px;
 	background: rgba(0,0,0,0.3);
 	border: 1px solid #fff;
 }
-/*「＞」アイコン設定*/
+/*「＞」アイコン設定 - PRODUCTS*/
+#menubar_hdr_prod.close {
+	background: url(../images/arrow2.png) no-repeat 20px 35px / 18px;
+}
+/*「＾」アイコン設定 - PRODUCTS*/
+#menubar_hdr_prod.open {
+	background: url(../images/arrow3.png) no-repeat 20px 35px / auto 18px;
+}
+/*「＞」アイコン設定 - WORKS*/
 #menubar_hdr2.close {
 	background: url(../images/arrow2.png) no-repeat 20px 35px / 18px;
 }
-/*「＾」アイコン設定*/
+/*「＾」アイコン設定 - WORKS*/
 #menubar_hdr2.open {
 	background: url(../images/arrow3.png) no-repeat 20px 35px / auto 18px;
 }
 /*子メニュー１個あたりの設定*/
-#menubar-s2 li a {
+#menubar-s2 li a, #menubar-s-prod li a {
 	border-bottom: 1px solid #fff !important;
 	padding: 10px 20px !important;
 }
-#menubar-s2 li:last-child a {
+#menubar-s2 li:last-child a, #menubar-s-prod li:last-child a {
 	border-bottom: none !important;
 }
 
