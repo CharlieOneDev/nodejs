@@ -227,37 +227,32 @@
                 <label for="inquiry_type">お問い合わせ種別<span class="required">必須</span></label>
                 <select id="inquiry_type" name="inquiry_type" required>
                     <option value="">選択してください</option>
-                    <option value="estimate" <?php if(isset($form['inquiry_type']) && $form['inquiry_type']=='estimate') echo 'selected'; ?>>お見積り依頼 (Quote)</option>
-                    <option value="catalog" <?php if(isset($form['inquiry_type']) && $form['inquiry_type']=='catalog') echo 'selected'; ?>>カタログ請求 (Catalog)</option>
-                    <option value="specs" <?php if(isset($form['inquiry_type']) && $form['inquiry_type']=='specs') echo 'selected'; ?>>詳細仕様の確認 (Spec Detail)</option>
-                    <option value="business" <?php if(isset($form['inquiry_type']) && $form['inquiry_type']=='business') echo 'selected'; ?>>新規お取引について (New Business)</option>
-                    <option value="other" <?php if(isset($form['inquiry_type']) && $form['inquiry_type']=='other') echo 'selected'; ?>>その他 (Other)</option>
+                    <option value="estimate">お見積り依頼 (Quote)</option>
+                    <option value="catalog">カタログ請求 (Catalog)</option>
+                    <option value="specs">詳細仕様の確認 (Spec Detail)</option>
+                    <option value="business">新規お取引について (New Business)</option>
+                    <option value="other">その他 (Other)</option>
                 </select>
-                <?php if(isset($msg['inquiry_type'])){ ?><p style="color:#e74c3c; font-size:0.9em; margin-top:5px;"><?php echo $msg['inquiry_type']; ?></p><?php } ?>
             </div>
 
             <div class="form-group">
                 <label for="company_name">貴社名 (法人のお客様)</label>
-                <input type="text" id="company_name" name="company_name" placeholder="例：大恩家具株式会社" value="<?php echo isset($form['company_name']) ? $form['company_name'] : ''; ?>">
-                <?php if(isset($msg['company_name'])){ ?><p style="color:#e74c3c; font-size:0.9em; margin-top:5px;"><?php echo $msg['company_name']; ?></p><?php } ?>
+                <input type="text" id="company_name" name="company_name" placeholder="例：大恩家具株式会社">
             </div>
 
             <div class="form-group">
                 <label for="item1">お名前 (ご担当者様)<span class="required">必須</span></label>
-                <input type="text" id="item1" name="item1" placeholder="例：山田 太郎" value="<?php echo isset($form['item1']) ? $form['item1'] : ''; ?>" required>
-                <?php if(isset($msg['item1'])){ ?><p style="color:#e74c3c; font-size:0.9em; margin-top:5px;"><?php echo $msg['item1']; ?></p><?php } ?>
+                <input type="text" id="item1" name="item1" placeholder="例：山田 太郎" required>
             </div>
 
             <div class="form-group">
                 <label for="item2">メールアドレス<span class="required">必須</span></label>
-                <input type="email" id="item2" name="item2" placeholder="例：info@daion.co.jp" value="<?php echo isset($form['item2']) ? $form['item2'] : ''; ?>" required>
-                <?php if(isset($msg['item2'])){ ?><p style="color:#e74c3c; font-size:0.9em; margin-top:5px;"><?php echo $msg['item2']; ?></p><?php } ?>
+                <input type="email" id="item2" name="item2" placeholder="例：info@daion.co.jp" required>
             </div>
 
             <div class="form-group">
                 <label for="item3">お問い合わせ内容<span class="required">必須</span></label>
-                <textarea id="item3" name="item3" rows="8" placeholder="ご質問、ご要望などをご記入ください。" required><?php echo isset($form['item3']) ? $form['item3'] : ''; ?></textarea>
-                <?php if(isset($msg['item3'])){ ?><p style="color:#e74c3c; font-size:0.9em; margin-top:5px;"><?php echo $msg['item3']; ?></p><?php } ?>
+                <textarea id="item3" name="item3" rows="8" placeholder="ご質問、ご要望などをご記入ください。" required></textarea>
             </div>
 
             <div class="form-button">
