@@ -69,10 +69,10 @@
         transform: scale(1.05);
         filter: brightness(0.5);
     }
-    /* 卡片各自的背景图 (复用现有图片) */
-    .card-faq::before { background-image: url('images/sample1-1.jpg'); }
-    .card-privacy::before { background-image: url('images/sample1-2.jpg'); }
-    .card-tokusho::before { background-image: url('images/sample1-3.jpg'); }
+    /* 卡片各自的背景图 */
+    .card-faq::before { background-image: url('images/faq.jpg'); }
+    .card-privacy::before { background-image: url('images/privacy.jpg'); }
+    .card-tokusho::before { background-image: url('images/tokusho.jpg'); }
 
     .guide-nav-card span {
         position: relative;
@@ -118,7 +118,15 @@
 <ul class="inner">
 <li><a href="index.html">HOME<span>ホーム</span></a></li>
 <li><a href="about.html">ABOUT<span>当社について</span></a></li>
-<li><a href="products.html">PRODUCTS<span>製品一覧</span></a></li>
+<li><a href="products.html">PRODUCTS<span>製品一覧</span></a>
+    <ul class="ddmenu">
+        <li><a href="products.html">すべて</a></li>
+        <li><a href="products.html?cat=sofa">ソファ</a></li>
+        <li><a href="products.html?cat=mattress">マットレス</a></li>
+        <li><a href="products.html?cat=table">テーブル</a></li>
+        <li><a href="products.html?cat=chair">チェア</a></li>
+    </ul>
+</li>
 <li><a href="javascript:void(0)" class="cursor-default">WORKS<span>業務内容</span></a>
     <ul class="ddmenu">
     <li><a href="business_corporate.html">法人向け事業</a></li>
@@ -137,7 +145,15 @@
 <ul>
 <li><a href="index.html">HOME<span>ホーム</span></a></li>
 <li><a href="about.html">ABOUT<span>当社について</span></a></li>
-<li><a href="products.html">PRODUCTS<span>製品一覧</span></a></li>
+<li id="menubar_hdr_prod" class="close">PRODUCTS<span>製品一覧</span>
+    <ul id="menubar-s-prod">
+        <li><a href="products.html">すべて</a></li>
+        <li><a href="products.html?cat=sofa">ソファ</a></li>
+        <li><a href="products.html?cat=mattress">マットレス</a></li>
+        <li><a href="products.html?cat=table">テーブル</a></li>
+        <li><a href="products.html?cat=chair">チェア</a></li>
+    </ul>
+</li>
 <li id="menubar_hdr2" class="close">WORKS<span>業務内容</span>
     <ul id="menubar-s2">
     <li><a href="business_corporate.html">法人向け事業</a></li>
@@ -254,6 +270,7 @@
 <!--菜单开闭脚本-->
 <div id="menubar_hdr" class="close"></div>
 <script>open_close("menubar_hdr", "menubar-s");</script>
+<script>open_close("menubar_hdr_prod", "menubar-s-prod");</script>
 <script>open_close("menubar_hdr2", "menubar-s2");</script>
 
 </body>

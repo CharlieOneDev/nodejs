@@ -28,7 +28,15 @@
 <ul class="inner">
 <li><a href="index.html">HOME<span>ホーム</span></a></li>
 <li><a href="about.html">ABOUT<span>当社について</span></a></li>
-<li><a href="products.html">PRODUCTS<span>製品一覧</span></a></li>
+<li><a href="products.html">PRODUCTS<span>製品一覧</span></a>
+    <ul class="ddmenu">
+        <li><a href="products.html">すべて</a></li>
+        <li><a href="products.html?cat=sofa">ソファ</a></li>
+        <li><a href="products.html?cat=mattress">マットレス</a></li>
+        <li><a href="products.html?cat=table">テーブル</a></li>
+        <li><a href="products.html?cat=chair">チェア</a></li>
+    </ul>
+</li>
 <li><a href="javascript:void(0)" class="cursor-default">WORKS<span>業務内容</span></a>
     <ul class="ddmenu">
     <li><a href="business_corporate.html">法人向け事業</a></li>
@@ -47,7 +55,15 @@
 <ul>
 <li><a href="index.html">HOME<span>ホーム</span></a></li>
 <li><a href="about.html">ABOUT<span>当社について</span></a></li>
-<li><a href="products.html">PRODUCTS<span>製品一覧</span></a></li>
+<li id="menubar_hdr_prod" class="close">PRODUCTS<span>製品一覧</span>
+    <ul id="menubar-s-prod">
+        <li><a href="products.html">すべて</a></li>
+        <li><a href="products.html?cat=sofa">ソファ</a></li>
+        <li><a href="products.html?cat=mattress">マットレス</a></li>
+        <li><a href="products.html?cat=table">テーブル</a></li>
+        <li><a href="products.html?cat=chair">チェア</a></li>
+    </ul>
+</li>
 <li id="menubar_hdr2" class="close">WORKS<span>業務内容</span>
     <ul id="menubar-s2">
     <li><a href="business_corporate.html">法人向け事業</a></li>
@@ -141,9 +157,14 @@
 open_close("menubar_hdr", "menubar-s");
 </script>
 
+<!--「PRODUCTS」の子メニュー-->
+<script>
+    open_close("menubar_hdr_prod", "menubar-s-prod");
+</script>
+
 <!--「WORKS」の子メニュー-->
 <script>
-	open_close("menubar_hdr2", "menubar-s2");
+    open_close("menubar_hdr2", "menubar-s2");
 </script>
 </body>
 </html>

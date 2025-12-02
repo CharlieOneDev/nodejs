@@ -36,7 +36,15 @@
 <ul class="inner">
 <li><a href="index.html">HOME<span>ホーム</span></a></li>
 <li><a href="about.html">ABOUT<span>当社について</span></a></li>
-<li><a href="products.html">PRODUCTS<span>製品一覧</span></a></li>
+<li><a href="products.html">PRODUCTS<span>製品一覧</span></a>
+    <ul class="ddmenu">
+        <li><a href="products.html">すべて</a></li>
+        <li><a href="products.html?cat=sofa">ソファ</a></li>
+        <li><a href="products.html?cat=mattress">マットレス</a></li>
+        <li><a href="products.html?cat=table">テーブル</a></li>
+        <li><a href="products.html?cat=chair">チェア</a></li>
+    </ul>
+</li>
 <li><a href="javascript:void(0)" class="cursor-default">WORKS<span>業務内容</span></a>
     <ul class="ddmenu">
     <li><a href="business_corporate.html">法人向け事業</a></li>
@@ -55,7 +63,15 @@
 <ul>
 <li><a href="index.html">HOME<span>ホーム</span></a></li>
 <li><a href="about.html">ABOUT<span>当社について</span></a></li>
-<li><a href="products.html">PRODUCTS<span>製品一覧</span></a></li>
+<li id="menubar_hdr_prod" class="close">PRODUCTS<span>製品一覧</span>
+    <ul id="menubar-s-prod">
+        <li><a href="products.html">すべて</a></li>
+        <li><a href="products.html?cat=sofa">ソファ</a></li>
+        <li><a href="products.html?cat=mattress">マットレス</a></li>
+        <li><a href="products.html?cat=table">テーブル</a></li>
+        <li><a href="products.html?cat=chair">チェア</a></li>
+    </ul>
+</li>
 <li id="menubar_hdr2" class="close">WORKS<span>業務内容</span>
     <ul id="menubar-s2">
     <li><a href="business_corporate.html">法人向け事業</a></li>
@@ -71,32 +87,24 @@
 
 <div id="contents">
 
-    <!-- Category nav -->
-    <div class="home-category-nav">
-        <a href="products.html" class="home-cat-card">
-            <svg class="cat-icon" viewBox="0 0 24 24"><path d="M20 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v3"></path><path d="M2 11v5a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5a2 2 0 0 0-4 0v2H6v-2a2 2 0 0 0-4 0z"></path></svg>
-            <h3>ソファ</h3>
-        </a>
-        <a href="products.html" class="home-cat-card">
-            <svg class="cat-icon" viewBox="0 0 24 24"><rect x="2" y="8" width="20" height="10" rx="2"></rect><path d="M2 13h20"></path><path d="M6 8v5 M10 8v5 M14 8v5 M18 8v5" stroke-opacity="0.3"></path></svg>
-            <h3>マットレス</h3>
-        </a>
-        <a href="products.html" class="home-cat-card">
-            <svg class="cat-icon" viewBox="0 0 24 24"><path d="M4 11v9"></path><path d="M20 11v9"></path><path d="M2 11h20"></path><path d="M4 11V7a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v4"></path></svg>
-            <h3>テーブル</h3>
-        </a>
-        <a href="products.html" class="home-cat-card">
-            <svg class="cat-icon" viewBox="0 0 24 24"><path d="M7 13V6a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v7"></path><path d="M4 13h16a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-2a1 1 0 0 1 1-1z"></path><path d="M7 17v5"></path><path d="M17 17v5"></path></svg>
-            <h3>チェア</h3>
-        </a>
-    </div>
-
     <!-- Brand video -->
     <section class="hero-video-section">
         <h2>Brand Movie</h2>
         <div class="video-container">
             <iframe src="https://www.youtube.com/embed/mV5wdTmGHWI?rel=0&modestbranding=1" title="Daion Furniture" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
         </div>
+    </section>
+
+    <!-- Brand banner -->
+    <section class="home-section-width">
+        <a href="https://www.nemon.co.jp" target="_blank" class="nemon-card">
+            <img src="images/5.jpg" alt="NEMON Brand">
+            <div class="nemon-text-box">
+                <p class="nemon-subtitle">Official EC Brand</p>
+                <h2 class="nemon-title">NEMON</h2>
+                <p class="nemon-cta">公式オンラインストアへ →</p>
+            </div>
+        </a>
     </section>
 
     <!-- Story section -->
@@ -124,18 +132,6 @@
         </div>
     </section>
 
-    <!-- Brand banner -->
-    <section class="home-section-width">
-        <a href="https://www.nemon.co.jp" target="_blank" class="nemon-card">
-            <img src="images/5.jpg" alt="NEMON Brand">
-            <div class="nemon-text-box">
-                <p class="nemon-subtitle">Official EC Brand</p>
-                <h2 class="nemon-title">NEMON</h2>
-                <p class="nemon-cta">公式オンラインストアへ →</p>
-            </div>
-        </a>
-    </section>
-
     <!-- News -->
     <section id="new">
         <h2>News</h2>
@@ -149,6 +145,26 @@
         </dl>
         <p class="r"><a href="javascript:void(0);" id="toggle-news" onclick="toggleNews()">▶︎&nbsp;過去ログ</a></p>
     </section>
+
+    <!-- Category nav -->
+    <div class="home-category-nav">
+        <a href="products.html?cat=sofa" class="home-cat-card">
+            <svg class="cat-icon" viewBox="0 0 24 24"><path d="M20 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v3"></path><path d="M2 11v5a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5a2 2 0 0 0-4 0v2H6v-2a2 2 0 0 0-4 0z"></path></svg>
+            <h3>ソファ</h3>
+        </a>
+        <a href="products.html?cat=mattress" class="home-cat-card">
+            <svg class="cat-icon" viewBox="0 0 24 24"><rect x="2" y="8" width="20" height="10" rx="2"></rect><path d="M2 13h20"></path><path d="M6 8v5 M10 8v5 M14 8v5 M18 8v5" stroke-opacity="0.3"></path></svg>
+            <h3>マットレス</h3>
+        </a>
+        <a href="products.html?cat=table" class="home-cat-card">
+            <svg class="cat-icon" viewBox="0 0 24 24"><path d="M4 11v9"></path><path d="M20 11v9"></path><path d="M2 11h20"></path><path d="M4 11V7a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v4"></path></svg>
+            <h3>テーブル</h3>
+        </a>
+        <a href="products.html?cat=chair" class="home-cat-card">
+            <svg class="cat-icon" viewBox="0 0 24 24"><path d="M7 13V6a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v7"></path><path d="M4 13h16a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-2a1 1 0 0 1 1-1z"></path><path d="M7 17v5"></path><path d="M17 17v5"></path></svg>
+            <h3>チェア</h3>
+        </a>
+    </div>
 
 </div> <!-- /#contents -->
 
@@ -206,6 +222,7 @@
 <!-- menu scripts -->
 <div id="menubar_hdr" class="close"></div>
 <script>open_close("menubar_hdr", "menubar-s");</script>
+<script>open_close("menubar_hdr_prod", "menubar-s-prod");</script>
 <script>open_close("menubar_hdr2", "menubar-s2");</script>
 
 <!-- small JS: toggle news -->

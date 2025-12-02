@@ -82,14 +82,39 @@ $user_mail = "item2";   // 利用者にメールを送る場合のメールア�
 //---
 $title = "お問い合わせフォーム";
 
-// --- 这是给客户的自动回复邮件 ---
-$subject = "【大恩家具 NEMON】お問い合わせありがとうございます"; // 邮件标题
+// --- 动态设置邮件标题 ---
+$inquiry_type = isset($_POST['inquiry_type']) ? $_POST['inquiry_type'] : '';
+
+// 默认标题（给客户的自动回复）
+$subject = "【大恩家具 NEMON】お問い合わせありがとうございます";
+
+// 根据类型修改标题 (方便客服快速识别 - 给管理员的邮件)
+switch ($inquiry_type) {
+    case 'estimate':
+        $subject_sys = "【見積依頼】Webサイトよりお問い合わせ";
+        break;
+    case 'catalog':
+        $subject_sys = "【カタログ請求】Webサイトよりお問い合わせ";
+        break;
+    case 'specs':
+        $subject_sys = "【仕様確認】Webサイトよりお問い合わせ";
+        break;
+    case 'business':
+        $subject_sys = "【新規取引】Webサイトよりお問い合わせ";
+        break;
+    case 'other':
+        $subject_sys = "【その他】Webサイトよりお問い合わせ";
+        break;
+    default:
+        $subject_sys = "【要対応】ウェブサイトより新しいお問い合わせがありました";
+        break;
+}
+
+// 邮件正文
 $body = "この度は、大恩家具 NEMONへお問い合わせいただき、誠にありがとうございます。\n"
       . "こちらは、お問い合わせ内容の受信をお知らせする自動返信メールです。\n\n"
       . "以下の内容で、お客様からのお問い合わせを確かに承りました。\n";
 
-// --- 这是给您自己（管理员）的通知邮件 ---
-$subject_sys = "【要対応】ウェブサイトより新しいお問い合わせがありました"; // 邮件标题
 $body_sys = "ウェブサイトのお問い合わせフォームから、新しいメッセージが届きました。\n"
           . "下記内容をご確認の上、速やかにご対応をお願いいたします。\n\n";
 $footer = "\n---\n"
@@ -181,6 +206,8 @@ $pref_list = array(
 //------------------------------------------------
 //
 $form_input = array(
+    "inquiry_type" => array("title" => "お問い合わせ種別", "name" => "inquiry_type", "func" => "2", "require" => "0", "check" => "1",),
+    "company_name" => array("title" => "貴社名", "name" => "company_name", "func" => "2", "require" => "0", "check" => "1",),
     "item1" => array("title" => "お名前", "name" => "item1", "func" => "2", "require" => "1", "check" => "1",),
     "item2" => array("title" => "メールアドレス", "name" => "item2", "func" => "2", "require" => "1", "check" => "3",), // 确保 item2 是用户邮箱字段
     "item3" => array("title" => "お問い合わせ内容", "name" => "item3", "func" => "7", "require" => "1", "check" => "1",),

@@ -34,13 +34,31 @@
         currentSubCat = 'all'; 
 
         // 样式切换
-        document.querySelectorAll('.cat-card').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.cat-capsule').forEach(el => el.classList.remove('active'));
         if(element) element.classList.add('active');
+
+        // 更新页面标题
+        updatePageTitle(cat);
 
         // 生成子分类按钮
         renderSubCategories(cat);
         // 执行筛选
         complexFilter();
+    }
+
+    /* 1.5 更新页面标题 */
+    function updatePageTitle(cat) {
+        const titleMap = {
+            'all': 'すべて(オーダーメイド対応)',
+            'sofa': 'ソファ',
+            'mattress': 'マットレス',
+            'table': 'テーブル',
+            'chair': 'チェア'
+        };
+        const titleElement = document.querySelector('section h2');
+        if (titleElement) {
+            titleElement.textContent = titleMap[cat] || '製品一覧(オーダーメイド対応)';
+        }
     }
 
     /* 2. 渲染子分类 */
@@ -137,7 +155,71 @@
         console.debug('complexFilter end', { visibleCount });
     }
 
-    /* 5. 加载数据 (使用新的 | 分隔符解析) */
+    /* 5. 动态生成筛选器 */
+    function generateDynamicFilters(products) {
+        // 1. Extract Colors
+        const colorSet = new Set();
+        products.forEach(p => {
+            if (p.colors) {
+                p.colors.split(/[\s,]+/).forEach(c => {
+                    if(c.trim()) colorSet.add(c.trim().toLowerCase());
+                });
+            }
+        });
+
+        // 2. Render Color Checkboxes
+        const colorContainer = document.querySelector('.filter-group:nth-child(4)');
+        let containerDiv = document.getElementById('dynamic-color-container');
+        if (!containerDiv) {
+            containerDiv = document.createElement('div');
+            containerDiv.id = 'dynamic-color-container';
+            containerDiv.style.maxHeight = '120px';
+            containerDiv.style.overflowY = 'auto';
+            colorContainer.appendChild(containerDiv);
+            // Remove hardcoded labels if any
+            const labels = colorContainer.querySelectorAll('label');
+            labels.forEach(l => l.remove());
+        }
+        containerDiv.innerHTML = '';
+
+        const colorMap = {
+            'black': 'ブラック',
+            'white': 'ホワイト',
+            'gray': 'グレー',
+            'brown': 'ブラウン',
+            'beige': 'ベージュ',
+            'green': 'グリーン',
+            'blue': 'ブルー',
+            'orange': 'オレンジ',
+            'dark gray': 'ダークグレー'
+        };
+        
+        Array.from(colorSet).sort().forEach(c => {
+            const labelText = colorMap[c] || (c.charAt(0).toUpperCase() + c.slice(1));
+            const label = document.createElement('label');
+            label.style.display = 'block';
+            label.innerHTML = `<input type="checkbox" name="filter-color" value="${c}" onchange="complexFilter()"> ${labelText}`;
+            containerDiv.appendChild(label);
+        });
+
+        // 3. Render Price Options (Ensure options exist)
+        const priceSelect = document.getElementById('filter-price');
+        if (priceSelect.options.length <= 1) { // Only "All" exists
+            const ranges = [
+                {v: 'under-20000', t: '¥20,000 以下'},
+                {v: '20000-30000', t: '¥20,000 - ¥30,000'},
+                {v: 'over-30000', t: '¥30,000 以上'}
+            ];
+            ranges.forEach(r => {
+                const opt = document.createElement('option');
+                opt.value = r.v;
+                opt.innerText = r.t;
+                priceSelect.appendChild(opt);
+            });
+        }
+    }
+
+    /* 6. 加载数据 (适配新的库存显示格式) */
     async function loadProductData() {
         try {
             const timestamp = new Date().getTime();
@@ -146,6 +228,9 @@
             
             const csvText = await response.text();
             const products = parseCSV(csvText);
+            
+            // Generate dynamic filters based on loaded products
+            generateDynamicFilters(products);
             
             const tbody = document.getElementById('product-tbody');
             tbody.innerHTML = '';
@@ -160,29 +245,80 @@
                 tr.setAttribute('data-colors', (product.colors || '').toLowerCase());
                 tr.setAttribute('data-search', `${product.sku} ${product.product_name} ${product.keywords}`.toLowerCase());
                 
-                // 处理换行符 (现在用 | 分隔)
+                // 处理换行符 (| 分隔)
                 const dimHtml = (product.dimensions_mm || '').replace(/\|/g, '<br>');
                 const matHtml = (product.material_desc || '').replace(/\|/g, '<br>');
+
+                // 库存/颜色显示处理 (适应 "Dark gray: 35" 格式)
+                let stockHtml = product.stock || '';
+                if (stockHtml.includes('|')) {
+                    // 多颜色库存，分行显示
+                    stockHtml = `<div style="font-size:0.85em; line-height:1.6;">` + 
+                                stockHtml.split('|').map(s => {
+                                    const parts = s.split(':');
+                                    if(parts.length > 1) {
+                                        const colorName = parts[0].trim();
+                                        const qty = parts[1].trim();
+                                        
+                                        // 判断数量状态
+                                        let qtyColor = '#e67e22'; // 默认橙色（有货）
+                                        let qtyWeight = '700';
+                                        
+                                        if (qty.includes('入荷') || qty.includes('予定')) {
+                                            // 即将到货 - 蓝色
+                                            qtyColor = '#2980b9';
+                                            qtyWeight = '700';
+                                        } else if (qty.includes('無') || qty.includes('受注')) {
+                                            // 无货/需定制 - 灰色
+                                            qtyColor = '#999';
+                                            qtyWeight = '500';
+                                        }
+                                        
+                                        return `<span style="color:#333; font-weight:500;">${colorName}:</span> <span style="color:${qtyColor}; font-weight:${qtyWeight};">${qty}</span>`;
+                                    }
+                                    return s;
+                                }).join('<br>') + 
+                                `</div>`;
+                } else {
+                    // 单行库存或特殊状态
+                    let stockColor = '#e67e22'; // 默认橙色（有货）
+                    let stockWeight = '500';
+                    
+                    if (stockHtml.includes('入荷') || stockHtml.includes('予定')) {
+                        // 即将到货 - 蓝色
+                        stockColor = '#2980b9';
+                        stockWeight = '700';
+                    } else if (stockHtml.includes('無') || stockHtml.includes('受注')) {
+                        // 无货/需定制 - 灰色
+                        stockColor = '#999';
+                        stockWeight = '500';
+                    }
+                    
+                    stockHtml = `<span style="color:${stockColor}; font-weight:${stockWeight}; font-size:0.9em;">${stockHtml}</span>`;
+                }
+
+                // 价格处理 (处理 "要相談" 文字)
+                const isNegotiable = product.msrp_price.includes('相談');
+                const priceDisplay = isNegotiable 
+                    ? `<span style="font-size:0.95em; color:#888; font-weight:600;">要相談</span>`
+                    : `<span style="color:#333; font-weight:700;">¥${product.msrp_price}</span>`;
 
                 tr.innerHTML = `
                     <td class="c"><input type="checkbox" name="product" value="${product.sku}"></td>
                     <td class="c"><img src="${product.image_url}" alt="${product.product_name}" loading="lazy"></td>
                     <td>
-                        <strong>${product.sku}</strong><br>
+                        <strong style="font-size:1.05em;">${product.sku}</strong><br>
                         <span style="font-size:0.85em; color:#888;">${formatCategory(product.category)}</span>
-                        ${ product.sub_category ? `<br><span style="font-size:0.8em; background:#eee; padding:1px 3px;">${product.sub_category}</span>` : '' }
+                        ${ product.sub_category ? `<br><span style="font-size:0.8em; background:#eee; padding:2px 6px; border-radius:3px;">${product.sub_category}</span>` : '' }
                     </td>
-                    <td><strong>${product.product_name}</strong></td>
+                    <td>
+                        <div style="margin-bottom:8px;"><strong style="font-size:0.9em; color:#333;">在庫・カラー:</strong><br>${stockHtml}</div>
+                    </td>
                     <td>
                         <div style="margin-bottom:5px;"><span class="spec-label">[Size]</span><br><span class="spec-text">${dimHtml}</span></div>
                         <div><span class="spec-label">[Spec]</span><br><span class="spec-text">${matHtml}</span></div>
                     </td>
-                    <td>
-                        <div><strong>MOQ:</strong> ${product.moq} pcs</div>
-                        <div style="margin-top:3px; font-size:0.85em; color:#666;">納期: ${product.lead_time}</div>
-                    </td>
-                    <td class="c">${product.cbm} m³</td>
-                    <td style="font-weight:bold;">${product.msrp_price}</td>
+                    <td class="c">${priceDisplay}</td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -258,8 +394,23 @@
     }
 
     // 灯箱
-    document.addEventListener('DOMContentLoaded', function() {
-        loadProductData(); 
+    document.addEventListener('DOMContentLoaded', async function() {
+        // 1. 加载数据
+        await loadProductData(); 
+
+        // 2. 检查 URL 参数并自动筛选
+        const params = new URLSearchParams(window.location.search);
+        const targetCat = params.get('cat');
+
+        if (targetCat) {
+            // 执行筛选并更新标题
+            selectMainCategory(targetCat, null);
+        } else {
+            // 默认显示全部时也更新标题
+            updatePageTitle('all');
+        }
+
+        // 3. 灯箱逻辑 (保持原有代码)
         const modal = document.getElementById('imageModal');
         const modalImg = document.getElementById('modalImage');
         const productTable = document.getElementById('product-list');
@@ -360,102 +511,86 @@
     }
     .close:hover { color: #bbb; }
 
-    /* ▼▼▼ 新版大品类导航 (极简文字图标版) ▼▼▼ */
+    /* ▼▼▼ Capsule Navigation Styles (Updated) ▼▼▼ */
     .category-nav {
         display: flex;
-        justify-content: center; /* 居中排列 */
-        flex-wrap: wrap; /* 允许换行 */
-        margin-bottom: 30px; /* 稍微减小下方留白 */
-        border-bottom: 1px solid #dcdcdc; /* 整个导航下方的一条细线，增加整体感 */
-        padding-bottom: 8px;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px; /* 间距稍微收紧 */
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #eee;
     }
-
-    /* ▼▼▼ 修正后的分类卡片样式 ▼▼▼ */
-    .cat-card {
-        display: flex;
-        flex-direction: column;
+    
+    .cat-capsule {
+        display: inline-flex;
         align-items: center;
         justify-content: center;
-        
-        background: transparent;
-        border: none;
-        border-right: 1px solid #e0e0e0; /* 分隔线颜色变淡一点 */
-        box-shadow: none;
-        border-radius: 0;
-        
-        padding: 10px 25px; /* 调整间距 */
+        /* 上下 7px，左右 24px -> 打造细长的视觉效果 */
+        padding: 7px 24px; 
+        border: 1px solid #e0e0e0;
+        /* 大圆角 */
+        border-radius: 100px; 
+        background-color: #fff;
+        color: #666;
         cursor: pointer;
-        transition: all 0.3s ease;
-        color: #999; /* 默认颜色稍微浅一点 */
-        min-width: 80px; /* 确保最小宽度 */
-    }
-
-    /* 最后一个元素去掉右侧分隔线 */
-    .cat-card:last-child {
-        border-right: none;
-    }
-
-    /* 悬停效果 */
-    .cat-card:hover {
-        color: #b4b096; 
-        transform: translateY(-2px);
-    }
-
-    /* 选中状态 */
-    .cat-card.active {
-        color: #333; 
-        font-weight: bold;
-        position: relative;
-    }
-
-    /* 选中时的底部指示线 */
-    .cat-card.active::after {
-        content: '';
-        display: block;
-        width: 20px; /* 线条短一点更精致 */
-        height: 2px;
-        background-color: #333;
-        position: absolute;
-        bottom: -5px; 
-    }
-
-    /* 文字样式 (修正换行问题) */
-    .cat-card h3 {
-        margin: 8px 0 0 0;
-        font-size: 12px; /* 字体改小 */
+        transition: all 0.2s ease;
+        /* 去除 min-width，让宽度随文字自动伸缩 */
+        min-width: auto; 
+        /* 字体稍微调小，显得更精致 */
+        font-size: 13px; 
         letter-spacing: 0.05em;
-        font-weight: normal;
-        white-space: nowrap; /* ★关键：强制不换行 */
-        line-height: 1;
     }
-
-    /* SVG 图标通用样式 */
+    
+    .cat-capsule:hover {
+        border-color: #b4b096;
+        color: #b4b096;
+        background-color: #fafafa;
+        transform: translateY(-1px);
+    }
+    
+    .cat-capsule.active {
+        background-color: #333;
+        color: #fff;
+        border-color: #333;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .cat-capsule.active .cat-icon {
+        stroke: #fff;
+    }
+    
+    .cat-capsule h3 {
+        margin: 0 0 0 8px;
+        font-size: inherit; /* 继承父级字体大小 */
+        font-weight: 500;
+        line-height: 1;
+        white-space: nowrap;
+    }
+    
     .cat-icon {
-        width: 26px; /* 图标稍微改小，配合小字体 */
-        height: 26px;
-        fill: none;
+        width: 15px;  /* 图标缩小适配细按钮 */
+        height: 15px;
         stroke: currentColor;
-        stroke-width: 1.5;
+        fill: none;
+        stroke-width: 1.5; /* 线条变细，更优雅 */
         stroke-linecap: round;
         stroke-linejoin: round;
+        margin-top: -1px; /* 微调垂直对齐 */
     }
-
-    /* 移动端适配 */
+    
+    /* Mobile适配 */
     @media screen and (max-width: 600px) {
+        .cat-capsule {
+            padding: 6px 16px; /* 手机端稍微紧凑一点 */
+            flex: 0 0 auto;    /* 防止手机端按钮被挤压变形 */
+        }
         .category-nav {
-            justify-content: flex-start;
-            overflow-x: auto;
-            border-bottom: none;
+            justify-content: flex-start; /* 手机端可以横向滑动或者左对齐 */
+            overflow-x: auto; /* 允许横向滚动（可选） */
+            padding-bottom: 10px;
+            white-space: nowrap;
         }
-        .cat-card {
-            padding: 8px 12px;
-            min-width: 60px;
-            border-right: 1px solid #eee; /* 手机上边框淡一点 */
-        }
-        .cat-card h3 {
-            font-size: 11px;
-        }
-        .cat-icon { width: 18px; height: 18px; }
     }
 
     /* ▼▼▼ 6. 新增：子分类标签栏样式 ▼▼▼ */
@@ -534,7 +669,15 @@
 <ul class="inner">
 <li><a href="index.html">HOME<span>ホーム</span></a></li>
 <li><a href="about.html">ABOUT<span>当社について</span></a></li>
-<li><a href="products.html">PRODUCTS<span>製品一覧</span></a></li>
+<li><a href="products.html">PRODUCTS<span>製品一覧</span></a>
+    <ul class="ddmenu">
+        <li><a href="products.html">すべて</a></li>
+        <li><a href="products.html?cat=sofa">ソファ</a></li>
+        <li><a href="products.html?cat=mattress">マットレス</a></li>
+        <li><a href="products.html?cat=table">テーブル</a></li>
+        <li><a href="products.html?cat=chair">チェア</a></li>
+    </ul>
+</li>
 <li><a href="javascript:void(0)" class="cursor-default">WORKS<span>業務内容</span></a>
     <ul class="ddmenu">
     <li><a href="business_corporate.html">法人向け事業</a></li>
@@ -553,7 +696,15 @@
 <ul>
 <li><a href="index.html">HOME<span>ホーム</span></a></li>
 <li><a href="about.html">ABOUT<span>当社について</span></a></li>
-<li><a href="products.html">PRODUCTS<span>製品一覧</span></a></li>
+<li id="menubar_hdr_prod" class="close">PRODUCTS<span>製品一覧</span>
+    <ul id="menubar-s-prod">
+        <li><a href="products.html">すべて</a></li>
+        <li><a href="products.html?cat=sofa">ソファ</a></li>
+        <li><a href="products.html?cat=mattress">マットレス</a></li>
+        <li><a href="products.html?cat=table">テーブル</a></li>
+        <li><a href="products.html?cat=chair">チェア</a></li>
+    </ul>
+</li>
 <li id="menubar_hdr2" class="close">WORKS<span>業務内容</span>
     <ul id="menubar-s2">
     <li><a href="business_corporate.html">法人向け事業</a></li>
@@ -571,64 +722,6 @@
 <div class="inner">
 <section>
     <h2>製品一覧(オーダーメイド対応)</h2>
-
-    <!-- ▼▼▼ 1. 大品类导航区 (Main Category) ▼▼▼ -->
-    <div class="category-nav">
-        <!-- すべて (全部) -->
-        <div class="cat-card active" onclick="selectMainCategory('all', this)">
-            <svg class="cat-icon" viewBox="0 0 24 24">
-                <rect x="3" y="3" width="7" height="7"></rect>
-                <rect x="14" y="3" width="7" height="7"></rect>
-                <rect x="14" y="14" width="7" height="7"></rect>
-                <rect x="3" y="14" width="7" height="7"></rect>
-            </svg>
-            <h3>すべて</h3>
-        </div>
-
-        <!-- ソファ (沙发) -->
-        <div class="cat-card" onclick="selectMainCategory('sofa', this)">
-            <svg class="cat-icon" viewBox="0 0 24 24">
-                <path d="M20 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v3"></path>
-                <path d="M2 11v5a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5a2 2 0 0 0-4 0v2H6v-2a2 2 0 0 0-4 0z"></path>
-            </svg>
-            <h3>ソファ</h3>
-        </div>
-
-        <!-- マットレス (床垫 - 新图标) -->
-        <div class="cat-card" onclick="selectMainCategory('mattress', this)">
-            <svg class="cat-icon" viewBox="0 0 24 24">
-                <!-- 床垫主体：圆角矩形 -->
-                <rect x="2" y="8" width="20" height="10" rx="2"></rect> 
-                <!-- 侧面纹理线条，表现厚度 -->
-                <path d="M2 13h20"></path> 
-                <!-- 表面一点点纹理 -->
-                <path d="M6 8v5 M10 8v5 M14 8v5 M18 8v5" stroke-opacity="0.3"></path>
-            </svg>
-            <h3>マットレス</h3>
-        </div>
-
-        <!-- テーブル (桌子) -->
-        <div class="cat-card" onclick="selectMainCategory('table', this)">
-            <svg class="cat-icon" viewBox="0 0 24 24">
-                <path d="M4 11v9"></path>
-                <path d="M20 11v9"></path>
-                <path d="M2 11h20"></path>
-                <path d="M4 11V7a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v4"></path>
-            </svg>
-            <h3>テーブル</h3>
-        </div>
-
-        <!-- チェア (椅子) -->
-        <div class="cat-card" onclick="selectMainCategory('chair', this)">
-            <svg class="cat-icon" viewBox="0 0 24 24">
-                <path d="M7 13V6a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v7"></path>
-                <path d="M4 13h16a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-2a1 1 0 0 1 1-1z"></path>
-                <path d="M7 17v5"></path>
-                <path d="M17 17v5"></path>
-            </svg>
-            <h3>チェア</h3>
-        </div>
-    </div>
 
     <!-- ▼▼▼ 2. 动态子分类区 (Sub Category) ▼▼▼ -->
     <div id="sub-category-area" class="sub-cat-container">
@@ -665,13 +758,10 @@
             </select>
         </div>
 
-        <!-- 颜色 -->
+        <!-- 颜色 (Dynamic) -->
         <div class="filter-group">
             <h4>カラー</h4>
-            <label><input type="checkbox" name="filter-color" value="gray" onchange="complexFilter()"> グレー系</label>
-            <label><input type="checkbox" name="filter-color" value="black" onchange="complexFilter()"> ブラック系</label>
-            <label><input type="checkbox" name="filter-color" value="white" onchange="complexFilter()"> ホワイト系</label>
-            <label><input type="checkbox" name="filter-color" value="green" onchange="complexFilter()"> グリーン系</label>
+            <!-- Dynamically generated by JavaScript -->
         </div>
     </div>
 
@@ -689,10 +779,8 @@
                 <th width="4%">選択</th>
                 <th width="8%">画像</th>
                 <th width="10%">品番/カテゴリ</th>
-                <th width="15%">製品名</th>
-                <th width="25%">仕様 (サイズ / 材質)</th>
-                <th width="12%">取引条件 (MOQ/納期)</th>
-                <th width="6%">CBM</th>
+                <th width="15%">在庫・カラー</th>
+                <th width="30%">サイズ / 仕様</th>
                 <th width="10%">参考価格 (税抜)</th>
             </tr>
         </thead>
@@ -775,6 +863,11 @@
 <!--メニューの開閉処理-->
 <script>
 open_close("menubar_hdr", "menubar-s");
+</script>
+
+<!--「PRODUCTS」の子メニュー-->
+<script>
+    open_close("menubar_hdr_prod", "menubar-s-prod");
 </script>
 
 <!--「WORKS」の子メニュー-->

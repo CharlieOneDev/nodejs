@@ -1,8 +1,20 @@
-﻿sku,sub_category,category,product_name,image_url,dimensions_mm,material_desc,moq,lead_time,cbm,msrp_price,price_filter,colors,keywords
-DK-M001,Spring,mattress,高密度ポケットコイルマットレス,images/production/mattress/DKM001WH2.jpg,"S: W970 x L1950 x H220|SD: W1200 x L1950 x H220|D: W1400 x L1950 x H220","構造: ポケットコイル（並行配列）|生地: プレミアムニット（防炎仕様）",10,30-45日,0.35,"22,000 - 38,000",22000,white,mattress spring hotel
-DK-S1867,Couch/L-Shape,sofa,モダンカウチソファセット,images/production/sofa/1867GY.jpg,"W2100 x D850 x H780|(SH420 mm)","脚部: スチール（黒粉体塗装）|張地: ポリエステル（フルカバーリング）",5,45-60日,0.85,"15,000 - 19,000",15000,gray black white,sofa couch modern
-DK-S2102,Module,sofa,モジュールソファシステム,images/production/sofa/2102GR.jpg,"1ユニット: W900 x D900 x H700|(レイアウト自由)","フレーム: 天然木（パイン材）|中材: 高密度ウレタンフォーム",5,45日,0.40,"15,000 - 19,000",15000,green orange,sofa module
-DK-S2130,2-Seater,sofa,コンパクト2Pソファ,images/production/sofa/2130GY.jpg,"W1400 x D750 x H700|(SH400 mm)","スタイル: 北欧モダン|木部: ラバーウッド無垂（ナチュラル）",1,在庫あり(即納),0.45,"13,000 - 17,000",13000,gray beige,sofa 2person
-DK-S2264,2-Seater,sofa,スタンダード2Pソファ,images/production/sofa/2264GY.jpg,"W1600 x D800 x H750|(SH410 mm)","デザイン: シンプルモダン|アーム: スリムタイプ設計",3,在庫あり(即納),0.50,"13,000 - 17,000",13000,gray darkgray black,sofa 2person
-DK-S2265,2-Seater,sofa,ラグジュアリー2Pソファ,images/production/sofa/2265GY.jpg,"W1650 x D820 x H760|(SH420 mm)","座面: フェザー + ウレタン積層|脚部: オーク無垢材",3,45日,0.55,"13,000 - 17,000",13000,gray darkgray black,sofa 2person
-DK-S2264-L,Module,sofa,ロータイプモジュールソファ,images/production/sofa/2264GY.jpg,"W1800 x D900 x H600|(SH350 mm)","タイプ: フロア/ロースタイル|和室タタミ対応傷防止フェルト付",5,60日,0.60,"21,000 - 27,000",21000,gray darkgray black,sofa module lowtype
+﻿image,sku,sub_category,category,product_name,image_url,dimensions_mm,material_desc,moq,lead_time,cbm,msrp_price,price_filter,colors,stock,keywords
+画像,DK-SB2264,Sofa Bed,sofa,モダンソファベッド 2264,images/production/sofa/DK-SB2264.jpg,W1710 x D760 x H710,木枠・ファブリック・スポンジ・樹脂脚|麻布,1,即納,0.5,"7,000",7000,ダークグレー グレー ブラック,ダークグレー: 35|グレー: 35|ブラック: 35,sofa bed stock
+画像,DK-S2265,2-Seater,sofa,2Pスタンダード 2265,images/production/sofa/DK-S2265.jpg,W1330 x D750 x H780,木枠・ファブリック・スポンジ・樹脂脚|麻布,1,即納,0.4,"7,800",7800,ダークグレー グレー ブラック,ダークグレー: 19|グレー: 18|ブラック: 14,sofa 2person stock
+画像,DK-S1867J,Couch/L-Shape,sofa,カウチソファセット 1867J,images/production/sofa/DK-S1867J.jpg,W1910 x D780 x H660,スエード・リネン・麻布|（生地選択可）,1,受注生産,0.6,"30,000",30000,受注生産,入荷予定：2025/12/23,sofa couch
+画像,DK-S2127-2P,Couch/L-Shape,sofa,L字型カウチソファ 2127-2P,images/production/sofa/DK-S2127-2P.jpg,W2200 x D1395 x H910,木枠・ファブリック・スポンジ・樹脂脚|要組立(2個口以上),1,在庫あり,0.53,"20,000",20000,ベージュ,|ベージュ: 4,sofa couch l-shape stock
+画像,DK-S2138,Couch/L-Shape,sofa,カウチソファ 2138,images/production/sofa/DK-S2138.jpg,W2100 x D1380 x H810,木枠・ファブリック・スポンジ・樹脂脚|要組立(複数個口),1,在庫あり,0.5,"25,000",25000,ブラック,|ブラック: 10,sofa couch stock
+画像,DK-SB2166,Sofa Bed,sofa,収納付きソファベッド 2166,images/production/sofa/DK-SB2166.jpg,W1550 x D840 x H880,木枠・ファブリック・スポンジ・樹脂脚|要組立,1,在庫あり,0.56,"18,000",18000,ベージュ グレー ブラック,ベージュ: 1|グレー: 1|ブラック: 1,sofa bed storage stock
+画像,DK-S2127-1P,1-Seater,sofa,1Pデザインソファ 2127-1P,images/production/sofa/DK-S2127-1P.jpg,W1320 x D1395 x H900,木枠・ファブリック・スポンジ・樹脂脚|要組立,1,在庫あり,0.32,"13,000",13000,ブラック,|ブラック: 4,sofa 1person stock
+画像,DK-S2127-1P-B,1-Seater,sofa,1Pデザインソファ 2127-1P(B),images/production/sofa/DK-S2127-1P-B.jpg,W1370 x D1380 x H980,木枠・ファブリック・スポンジ・樹脂脚|要組立,1,在庫あり,0.33,"13,000",13000,ブルー,|ブルー: 3,sofa 1person stock
+画像,DK-S2143-1P,1-Seater,sofa,リラックス1Pソファ 2143,images/production/sofa/DK-S2143-1P.jpg,W1080 x D1460 x H1000,木枠・ファブリック・スポンジ・樹脂脚|要組立,1,在庫あり,0.52,"15,000",15000,ベージュ グリーン ブラック グレー コーヒー,ベージュ: 3|グリーン: 3|ブラック: 3|グレー: 3|コーヒー: 3,sofa 1person stock
+画像,DK-S2130,Sofa Bed,sofa,ソファベッド 2130,images/production/sofa/DK-S2130.jpg,W1915 x D970 x H770,木枠・ファブリック・スポンジ・木製脚|要組立,1,在庫あり,0.35,"14,000",14000,ベージュ グレー,ベージュ: 5|グレー: 5,sofa bed stock
+画像,DK-S2102,Module,sofa,モジュールソファセット 2102,images/production/sofa/DK-S2102.jpg,W2620 x D760 x H820,木枠・ファブリック・スポンジ・樹脂脚|要組立(複数個口),1,在庫あり,0.73,"18,000",18000,ホワイト オレンジ グリーン,ホワイト: 5|オレンジ: 5|グリーン: 4,sofa module stock
+画像,DK-S2071,Couch/L-Shape,sofa,大型カウチソファ 2071,images/production/sofa/DK-S2071.jpg,W2400 x D1460 x H670,木枠・ファブリック・スポンジ・樹脂脚|要組立(複数個口),1,在庫あり,0.9,"23,000",23000,オレンジ,|オレンジ: 10,sofa couch large stock
+画像,DK-S2148,1-Seater,sofa,コンパクト1Pソファ 2148,images/production/sofa/DK-S2148.jpg,W790 x D890 x H850,木枠・ファブリック・スポンジ・金属脚|要組立,1,在庫あり,0.48,"10,000",10000,オレンジ ブラウン ブルー グリーン,オレンジ: 1|ブラウン: 1|ブルー: 1|グリーン: 1,sofa 1person stock
+画像,DK-M001,Spring,mattress,高密度ポケットコイルマットレス,images/production/mattress/DK-M001.jpg,S: W970 x L1950 x H220|SD: W1200 x L1950 x H220|D: W1400 x L1950 x H220,構造: ポケットコイル（並行配列）|生地: プレミアムニット（防炎仕様）,99,受注生産,0.35,"22,000",22000,ホワイト,|ホワイト: 100,mattress spring hotel stock
+画像,DK-SB001,Sofa Bed,sofa,折りたたみソファベッド SB001,images/production/sofa/DK-SB001.jpg,座A: W1200 x D760 x H730|座B: W600 x D760 x H730,ベルベット、防水布,0,受注生産,0.4,要相談,0,グレー,無 (受注生産),sofa bed
+画像,DK-S002,3-Seater,sofa,デザイン3Pソファ S002,images/production/sofa/DK-S002.jpg,3P: W2060 x D860 x H790,コーデュロイ、防水布,0,受注生産,0.6,要相談,0,グリーン,無 (受注生産),sofa 3person
+画像,DK-S003,Couch/L-Shape,sofa,モジュールL字ソファ S003,images/production/sofa/DK-S003.jpg,肘付きA: W1830 x D930 x H670|肘付きB: W1500 x D930 x H670|オットマン: W930 x D640 x H410,コーデュロイ、防水布,0,受注生産,0.85,要相談,0,グリーン,無 (受注生産),sofa couch
+画像,DK-S004,2-Seater,sofa,コンパクト2Pソファ S004,images/production/sofa/DK-S004.jpg,肘付き: W1200 x D630 x H650|肘なし: W1200 x D630 x H650,光沢PVCレザー,0,受注生産,0.45,要相談,0,グリーン キャメル,無 (受注生産),sofa 2person
+画像,DK-S3040,2-Seater,sofa,モダンソファ 3040,images/production/sofa/DK-S3040.jpg,W1760 x D800 x H800,木枠・亮光PVC・スポンジ・樹脂脚,0,受注生産,0.6,要相談,0,ブラウン,無 (受注生産),sofa stock

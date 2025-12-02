@@ -30,7 +30,15 @@
 <ul class="inner">
 <li><a href="index.html">HOME<span>ホーム</span></a></li>
 <li><a href="about.html">ABOUT<span>当社について</span></a></li>
-<li><a href="products.html">PRODUCTS<span>製品一覧</span></a></li>
+<li><a href="products.html">PRODUCTS<span>製品一覧</span></a>
+    <ul class="ddmenu">
+        <li><a href="products.html">すべて</a></li>
+        <li><a href="products.html?cat=sofa">ソファ</a></li>
+        <li><a href="products.html?cat=mattress">マットレス</a></li>
+        <li><a href="products.html?cat=table">テーブル</a></li>
+        <li><a href="products.html?cat=chair">チェア</a></li>
+    </ul>
+</li>
 <li><a href="javascript:void(0)" class="cursor-default">WORKS<span>業務内容</span></a>
     <ul class="ddmenu">
     <li><a href="business_corporate.html">法人向け事業</a></li>
@@ -49,7 +57,15 @@
 <ul>
 <li><a href="index.html">HOME<span>ホーム</span></a></li>
 <li><a href="about.html">ABOUT<span>当社について</span></a></li>
-<li><a href="products.html">PRODUCTS<span>製品一覧</span></a></li>
+<li id="menubar_hdr_prod" class="close">PRODUCTS<span>製品一覧</span>
+    <ul id="menubar-s-prod">
+        <li><a href="products.html">すべて</a></li>
+        <li><a href="products.html?cat=sofa">ソファ</a></li>
+        <li><a href="products.html?cat=mattress">マットレス</a></li>
+        <li><a href="products.html?cat=table">テーブル</a></li>
+        <li><a href="products.html?cat=chair">チェア</a></li>
+    </ul>
+</li>
 <li id="menubar_hdr2" class="close">WORKS<span>業務内容</span>
     <ul id="menubar-s2">
     <li><a href="business_corporate.html">法人向け事業</a></li>
@@ -74,36 +90,70 @@
 <!-- フォームの情報はここからです -->
 <form name="form1" enctype="multipart/form-data" method="post" action="<?php echo $_SERVER["REQUEST_URI"];?>">
 <input type="hidden" name="mode" value="confirm">
+<!-- 隠藏域：传递商品信息文本 -->
+<input type="hidden" name="product_details_text" value="<?php echo isset($form['product_details_text']) ? $form['product_details_text'] : ''; ?>">
+
 <table class="ta1">
-<!--<tr><td colspan="2" class="auto"><strong>確認画面</strong></td></tr>-->
-<!-- 入力／確認 -->
-<!--<tr><th class="tamidashi" colspan="2">お問い合わせフォーム</th></tr>-->
-<tr>
-<th width="150">お名前</th>
-<td>
-<input type="hidden" name="item1" value="<?php echo $form["item1"];?>">
-<?php echo $form["item1"];?>
-</td>
-</tr>
-<tr>
-<th width="150">メールアドレス</th>
-<td>
-<input type="hidden" name="item2" value="<?php echo $form["item2"];?>">
-<?php echo $form["item2"];?>
-</td>
-</tr>
-<tr>
-<th>お問い合わせ内容</th>
-<td>
-<input type="hidden" name="item3" value="<?php echo $form["item3"]; ?>">
-<?php echo nl2br($form["item3"]);?>
-</td>
-</tr>
+    <!-- 1. お問い合わせ種別 (新增) -->
+    <tr>
+        <th width="150">お問い合わせ種別</th>
+        <td>
+            <input type="hidden" name="inquiry_type" value="<?php echo $form["inquiry_type"];?>">
+            <?php 
+                // 将 value 转换为日语显示
+                $type_map = array(
+                    'estimate' => 'お見積り依頼 (Quote)',
+                    'catalog' => 'カタログ請求 (Catalog)',
+                    'specs' => '詳細仕様の確認 (Spec Detail)',
+                    'business' => '新規お取引について (New Business)',
+                    'other' => 'その他 (Other)'
+                );
+                echo isset($type_map[$form["inquiry_type"]]) ? $type_map[$form["inquiry_type"]] : $form["inquiry_type"];
+            ?>
+        </td>
+    </tr>
+
+    <!-- 2. 貴社名 (新增) -->
+    <tr>
+        <th>貴社名</th>
+        <td>
+            <input type="hidden" name="company_name" value="<?php echo $form["company_name"];?>">
+            <?php echo $form["company_name"];?>
+        </td>
+    </tr>
+
+    <!-- 3. お名前 -->
+    <tr>
+        <th>お名前</th>
+        <td>
+            <input type="hidden" name="item1" value="<?php echo $form["item1"];?>">
+            <?php echo $form["item1"];?>
+        </td>
+    </tr>
+
+    <!-- 4. メールアドレス -->
+    <tr>
+        <th>メールアドレス</th>
+        <td>
+            <input type="hidden" name="item2" value="<?php echo $form["item2"];?>">
+            <?php echo $form["item2"];?>
+        </td>
+    </tr>
+
+    <!-- 5. お問い合わせ内容 -->
+    <tr>
+        <th>お問い合わせ内容</th>
+        <td>
+            <input type="hidden" name="item3" value="<?php echo $form["item3"]; ?>">
+            <?php echo nl2br($form["item3"]);?>
+        </td>
+    </tr>
 </table>
+
 <div class="c">
-<input type="submit" value="送信する" class="btn">
-&nbsp;
-<input type="button" value="戻る" onClick="document.form1.mode.value='reinput';document.form1.submit()" class="btn">
+    <input type="submit" value="送信する" class="btn">
+    &nbsp;
+    <input type="button" value="戻る" onClick="document.form1.mode.value='reinput';document.form1.submit()" class="btn">
 </div>
 </form>
 <!-- フォームの情報はここまでです -->
@@ -175,10 +225,13 @@
 open_close("menubar_hdr", "menubar-s");
 </script>
 
-<!--「WORKS」の子メニュー-->
+<!--「PRODUCTS」の子メニュー-->
 <script>
-	open_close("menubar_hdr2", "menubar-s2");
+    open_close("menubar_hdr_prod", "menubar-s-prod");
 </script>
 
-</body>
+<!--「WORKS」の子メニュー-->
+<script>
+    open_close("menubar_hdr2", "menubar-s2");
+</script></body>
 </html>
