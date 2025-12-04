@@ -23,12 +23,11 @@
 
 <header>
 <h1 id="logo"><a href="index.html"><img src="images/logo-color.png" alt="ホーム"></a></h1>
-<!-- slideshow -->
-<aside id="mainimg">
-<img src="images/0.png" alt="" class="slide0">
-<img src="images/1.png" alt="" class="slide1">
-<img src="images/3.jpg" alt="" class="slide2">
-</aside>
+<!-- 原来的 aside 图片轮播删掉，换成这个 -->
+<div id="main-video-area">
+    <video src="images/top_movie.mp4" autoplay muted loop playsinline poster="images/0.png"></video>
+    <!-- poster属性是视频加载前显示的封面图，可以用原来的0.png -->
+</div>
 </header>
 
 <!--PC用（801px以上端末）メニュー-->
@@ -234,6 +233,114 @@ function toggleNews(){
   items.forEach(i=> i.style.display = isHidden ? 'block' : 'none');
   document.getElementById('toggle-news').innerHTML = isHidden ? '▲&nbsp;閉じる' : '▶︎&nbsp;過去ログ';
 }
+</script>
+
+<!-- 背景音乐播放器 -->
+<div id="bgm-player">
+    <audio id="bgm-audio" loop>
+        <!-- 请修改这里的文件路径 -->
+        <source src="music/bgm.mp3" type="audio/mp3">
+    </audio>
+    <button id="bgm-toggle" onclick="toggleBGM()">
+        <span id="bgm-icon">🎵</span>
+        <span id="bgm-text">Play Music</span>
+    </button>
+</div>
+
+<!-- 包含音乐控制和视频样式的 CSS/JS -->
+<style>
+    /* === 顶部视频样式 === */
+    #main-video-area {
+        width: 100%;
+        /* 这里控制视频区域高度，可以根据需要调整，例如 60vh 或 100vh */
+        height: auto; 
+        overflow: hidden;
+        position: relative;
+        z-index: 0;
+    }
+    #main-video-area video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* 保证视频填满区域且不变形 */
+        display: block;
+    }
+
+    /* === 悬浮音乐按钮样式 === */
+    #bgm-player {
+        position: fixed;
+        bottom: 20px;
+        left: 20px; /* 改为左下角，避免与返回顶部按钮冲突 */
+        z-index: 9999;
+    }
+    #bgm-toggle {
+        background: rgba(0, 0, 0, 0.6);
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50px;
+        padding: 10px 20px;
+        cursor: pointer;
+        font-family: sans-serif;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s;
+        backdrop-filter: blur(5px);
+    }
+    #bgm-toggle:hover {
+        background: rgba(0, 0, 0, 0.8);
+        transform: scale(1.05);
+    }
+    /* 播放时的旋转动画 */
+    .rotating {
+        animation: spin 3s linear infinite;
+    }
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+</style>
+
+<script>
+    // === 音乐控制脚本 ===
+    function toggleBGM() {
+        var audio = document.getElementById("bgm-audio");
+        var btnText = document.getElementById("bgm-text");
+        var icon = document.getElementById("bgm-icon");
+
+        if (audio.paused) {
+            audio.play().then(() => {
+                btnText.innerHTML = "Pause Music";
+                icon.classList.add("rotating"); // 让图标转起来
+            }).catch(error => {
+                console.log("播放失败，可能是浏览器限制:", error);
+            });
+        } else {
+            audio.pause();
+            btnText.innerHTML = "Play Music";
+            icon.classList.remove("rotating");
+        }
+    }
+
+    // 尝试在页面加载后自动播放（注意：大部分现代浏览器会拦截这一步）
+    window.addEventListener('load', function() {
+        var audio = document.getElementById("bgm-audio");
+        // 尝试降低音量开始播放，减少突兀感
+        audio.volume = 0.5; 
+        
+        // 尝试自动播放
+        var playPromise = audio.play();
+        if (playPromise !== undefined) {
+            playPromise.then(_ => {
+                // 自动播放成功
+                document.getElementById("bgm-text").innerHTML = "Pause Music";
+                document.getElementById("bgm-icon").classList.add("rotating");
+            }).catch(error => {
+                // 自动播放被浏览器拦截，保持暂停状态，等待用户点击
+                console.log("自动播放被拦截，需要用户交互");
+            });
+        }
+    });
 </script>
 
 </body>
